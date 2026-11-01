@@ -1,724 +1,1344 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lesson 1: Bats – Echolocation and Evolutionary Adaptation</title>
+    <title>Lesson 1: Bats – Echolocation & Evolutionary Adaptation</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
                     colors: {
                         pastel: {
-                            blue: '#e0f2fe',
-                            sky: '#f0f9ff',
-                            mint: '#ecfdf5',
-                            card: '#ffffff',
-                            dark: '#0f172a',
-                            accent: '#0284c7',
+                            50: '#f0f7ff',
+                            100: '#e0f0fe',
+                            200: '#bae0fd',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
                         }
                     }
                 }
             }
         }
     </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .transition-all { transition: all 0.3s ease; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .tab-btn.active { background-color: #3b82f6; color: white; border-color: #3b82f6; }
+        .flashcard-inner { transition: transform 0.6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { backface-visibility: hidden; }
+        .flashcard-back { transform: rotateY(180deg); }
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="bg-pastel-sky text-slate-800 min-h-screen flex flex-col">
+<body class="text-slate-800 bg-slate-50 min-h-screen flex flex-col">
 
-    <!-- Header -->
-    <header class="bg-white border-b border-sky-100 shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-sky-500 text-white flex items-center justify-center font-bold text-xl shadow-md">
-                    🦇
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold text-slate-900">Lesson 1: Bats – Echolocation & Evolution</h1>
-                    <p class="text-xs text-slate-500">Định vị bằng âm thanh và thích nghi tiến hóa ở loài dơi</p>
-                </div>
-            </div>
-            <!-- Quick Progress bar & Reset -->
-            <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-                <div class="flex items-center gap-2 bg-sky-50 px-3 py-1.5 rounded-full border border-sky-100">
-                    <span class="text-xs font-semibold text-sky-700">Tiến độ:</span>
-                    <div class="w-24 bg-gray-200 rounded-full h-2.5 overflow-hidden">
-                        <div id="header-progress-bar" class="bg-sky-500 h-2.5 rounded-full transition-all" style="width: 0%"></div>
+    <!-- Header Navigation -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-blue-500 text-white p-2 rounded-lg shadow">
+                        <i class="fa-solid me-1 fa-bat fa-lg"></i>
+                        <i class="fa-solid fa-wave-square"></i>
                     </div>
-                    <span id="header-progress-text" class="text-xs font-bold text-sky-800">0%</span>
+                    <div>
+                        <h1 class="text-lg font-bold text-slate-800 leading-tight">BioEnglish B1–B2</h1>
+                        <p class="text-xs text-slate-500">Lesson 1: Bats & Echolocation</p>
+                    </div>
                 </div>
-                <button onclick="resetProgress()" class="text-xs text-rose-600 hover:text-rose-800 font-medium px-2.5 py-1.5 rounded border border-rose-200 bg-rose-50 hover:bg-rose-100 transition">
-                    Đặt lại
-                </button>
+                <!-- Navigation Tabs -->
+                <nav class="hidden md:flex space-x-1 lg:space-x-2 text-sm font-medium">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="tab-btn px-3 py-2 rounded-lg transition active">
+                        <i class="fa-solid fa-chart-line mr-1"></i> Dashboard
+                    </button>
+                    <button onclick="switchTab('lesson')" id="nav-lesson" class="tab-btn px-3 py-2 rounded-lg transition">
+                        <i class="fa-solid fa-book-open mr-1"></i> Lesson
+                    </button>
+                    <button onclick="switchTab('vocab')" id="nav-vocab" class="tab-btn px-3 py-2 rounded-lg transition">
+                        <i class="fa-solid fa-language mr-1"></i> Vocabulary
+                    </button>
+                    <button onclick="switchTab('practice')" id="nav-practice" class="tab-btn px-3 py-2 rounded-lg transition">
+                        <i class="fa-solid fa-pen-to-square mr-1"></i> Exercises
+                    </button>
+                    <button onclick="switchTab('quiz')" id="nav-quiz" class="tab-btn px-3 py-2 rounded-lg transition">
+                        <i class="fa-solid fa-graduation-cap mr-1"></i> Final Quiz
+                    </button>
+                    <button onclick="switchTab('speaking')" id="nav-speaking" class="tab-btn px-3 py-2 rounded-lg transition">
+                        <i class="fa-solid fa-microphone mr-1"></i> Speaking
+                    </button>
+                    <button onclick="switchTab('review')" id="nav-review" class="tab-btn px-3 py-2 rounded-lg transition">
+                        <i class="fa-solid fa-square-check mr-1"></i> Review
+                    </button>
+                </nav>
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="text-slate-600 p-2 rounded-md hover:bg-slate-100">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
             </div>
+        </div>
+        <!-- Mobile Dropdown Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-4 space-y-1 shadow-lg">
+            <button onclick="switchTab('dashboard'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-slate-700 hover:bg-blue-50">Dashboard</button>
+            <button onclick="switchTab('lesson'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-slate-700 hover:bg-blue-50">Lesson Content</button>
+            <button onclick="switchTab('vocab'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-slate-700 hover:bg-blue-50">Vocabulary</button>
+            <button onclick="switchTab('practice'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-slate-700 hover:bg-blue-50">Comprehension Exercises</button>
+            <button onclick="switchTab('quiz'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-slate-700 hover:bg-blue-50">Final Quiz</button>
+            <button onclick="switchTab('speaking'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-slate-700 hover:bg-blue-50">Speaking Practice</button>
+            <button onclick="switchTab('review'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-slate-700 hover:bg-blue-50">Final Review</button>
         </div>
     </header>
 
-    <!-- Main Container -->
-    <div class="max-w-7xl mx-auto w-full px-4 py-6 flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6">
-        
-        <!-- Sidebar Navigation -->
-        <aside class="lg:col-span-1">
-            <div class="bg-white rounded-2xl shadow-sm border border-sky-100 p-4 sticky top-24">
-                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 px-2">Mục lục bài học</h2>
-                <nav id="nav-list" class="space-y-1.5">
-                    <!-- Nav items generated via JS -->
-                </nav>
-            </div>
-        </aside>
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
 
-        <!-- Content Area -->
-        <main class="lg:col-span-3 space-y-6">
-            
-            <!-- Dashboard View -->
-            <div id="section-dashboard" class="content-section bg-white rounded-2xl shadow-sm border border-sky-100 p-6 md:p-8">
-                <div class="border-b border-gray-100 pb-4 mb-6">
-                    <span class="inline-block px-3 py-1 bg-sky-100 text-sky-800 rounded-full text-xs font-semibold mb-2">Tổng quan</span>
-                    <h2 class="text-2xl font-bold text-slate-900">Dashboard Tiến độ Học tập</h2>
-                    <p class="text-sm text-slate-600 mt-1">Theo dõi hành trình chinh phục kiến thức sinh học về loài dơi.</p>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-                    <div class="bg-sky-50 border border-sky-100 rounded-xl p-5 text-center">
-                        <div class="text-3xl font-extrabold text-sky-600 mb-1" id="dash-completed-count">0 / 6</div>
-                        <div class="text-xs font-medium text-slate-600">Phần bài học hoàn thành</div>
-                    </div>
-                    <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-5 text-center">
-                        <div class="text-3xl font-extrabold text-emerald-600 mb-1" id="dash-progress-pct">0%</div>
-                        <div class="text-xs font-medium text-slate-600">Tỷ lệ hoàn thành tổng thể</div>
-                    </div>
-                    <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-5 text-center">
-                        <div class="text-3xl font-extrabold text-indigo-600 mb-1" id="dash-quiz-score">Chưa thi</div>
-                        <div class="text-xs font-medium text-slate-600">Điểm kiểm tra cuối bài</div>
-                    </div>
-                </div>
-
-                <div class="bg-slate-50 border border-slate-200 rounded-xl p-6">
-                    <h3 class="font-bold text-slate-800 mb-2">Chào mừng bạn đến với Lesson 1!</h3>
-                    <p class="text-sm text-slate-600 leading-relaxed mb-4">
-                        Web app này được thiết kế theo phương pháp tương tác tích cực (Active Learning). Hãy khám phá lần lượt các phần từ 1 đến 6, đọc kỹ kiến thức, làm các bài tập kiểm tra nhỏ trong từng phần, và hoàn thành 10 câu hỏi trắc nghiệm ở phần 7.
-                    </p>
-                    <button onclick="switchSection(1)" class="px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold rounded-xl shadow transition">
-                        Bắt đầu học ngay 🚀
+        <!-- 1. DASHBOARD SECTION -->
+        <section id="sec-dashboard" class="space-y-6">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 sm:p-8 text-white shadow-xl">
+                <div class="max-w-3xl">
+                    <span class="inline-block bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider mb-3">Biology & Natural Science</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold mb-2">Lesson 1: Bats – Echolocation and Evolutionary Adaptation</h2>
+                    <p class="text-blue-100 text-sm sm:text-base leading-relaxed mb-6">Master scientific concepts in English, expand your B1-B2 academic vocabulary, and learn how bats use ultrasound for navigation and hunting.</p>
+                    <button onclick="switchTab('lesson')" class="bg-white text-blue-600 hover:bg-blue-50 font-bold px-6 py-3 rounded-xl shadow-md transition-all flex items-center gap-2">
+                        <span>Continue Learning</span> <i class="fa-solid fa-arrow-right"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- Section 1 -->
-            <div id="section-1" class="content-section hidden bg-white rounded-2xl shadow-sm border border-sky-100 p-6 md:p-8">
-                <div class="border-b border-gray-100 pb-4 mb-6">
-                    <span class="inline-block px-3 py-1 bg-sky-100 text-sky-800 rounded-full text-xs font-semibold mb-2">Phần 1 / 7</span>
-                    <h2 class="text-2xl font-bold text-slate-900">1. Định vị bằng âm thanh (Echolocation)</h2>
-                    <p class="text-sm text-slate-500 mt-1">Mục tiêu: Hiểu cơ chế cơ bản và lịch sử phát hiện định vị bằng âm thanh ở dơi.</p>
-                </div>
-
-                <div class="space-y-4 text-sm text-slate-700 leading-relaxed">
-                    <p>
-                        Dơi là loài động vật có vú có khả năng bay thực sự. Nhiều loài dơi hoạt động vào ban đêm và sử dụng một khả năng đặc biệt gọi là <strong>Echolocation</strong> (định vị bằng âm thanh).
-                    </p>
-                    
-                    <div class="bg-sky-50 border-l-4 border-sky-500 p-4 rounded-r-xl my-4">
-                        <h4 class="font-bold text-sky-900 mb-2">Quá trình Echolocation gồm ba bước:</h4>
-                        <ol class="list-decimal list-inside space-y-1 text-slate-700">
-                            <li><strong>Phát:</strong> Dơi phát ra âm thanh tần số cao.</li>
-                            <li><strong>Phản xạ:</strong> Âm thanh va vào vật thể và phản xạ trở lại.</li>
-                            <li><strong>Tiếp nhận & Xử lý:</strong> Dơi nhận âm phản hồi và sử dụng thông tin đó để xác định vị trí vật thể.</li>
-                        </ol>
-                    </div>
-
-                    <p>
-                        <em>Ví dụ thực tế:</em> Khi một con bướm bay gần đó, dơi phát âm thanh. Âm thanh phản xạ từ con bướm trở lại tai dơi, giúp nó xác định vị trí chính xác và bắt mồi.
-                    </p>
-
-                    <!-- Interactive Click to Reveal: History -->
-                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 mt-6">
-                        <h4 class="font-bold text-slate-800 mb-2">📜 Lịch sử khám phá Echolocation</h4>
-                        <p class="text-xs text-slate-500 mb-3">Nhấn vào các mốc thời gian để xem chi tiết:</p>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <button onclick="toggleReveal('hist-1')" class="text-left p-3 rounded-lg bg-white border border-slate-200 hover:border-sky-300 shadow-sm transition">
-                                <span class="font-bold text-sky-600">Năm 1793:</span> Lazzaro Spallanzani <span class="text-xs text-slate-400 block">Bấm để xem thí nghiệm</span>
-                            </button>
-                            <button onclick="toggleReveal('hist-2')" class="text-left p-3 rounded-lg bg-white border border-slate-200 hover:border-sky-300 shadow-sm transition">
-                                <span class="font-bold text-sky-600">Năm 1938:</span> Donald R. Griffin <span class="text-xs text-slate-400 block">Bấm để xem thuật ngữ</span>
-                            </button>
-                        </div>
-                        <div id="hist-1" class="hidden mt-3 p-3 bg-sky-50 rounded-lg text-xs text-slate-700 border border-sky-100">
-                            <strong>Lazzaro Spallanzani (1793):</strong> Chứng minh rằng dơi bị bịt mắt vẫn có thể định hướng bay lượn bình thường, nhưng dơi bị làm điếc lại gặp khó khăn nghiêm trọng.
-                        </div>
-                        <div id="hist-2" class="hidden mt-3 p-3 bg-sky-50 rounded-lg text-xs text-slate-700 border border-sky-100">
-                            <strong>Donald R. Griffin (1938):</strong> Chính thức đưa ra thuật ngữ khoa học <strong>Echolocation</strong> để mô tả hiện tượng này.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section Footer Navigation & Complete -->
-                <div class="mt-8 pt-4 border-t border-gray-100 flex justify-between items-center">
-                    <button onclick="markSectionComplete(1)" id="btn-complete-1" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow transition">
-                        ✓ Đánh dấu đã học phần này
-                    </button>
-                    <button onclick="switchSection(2)" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-lg shadow transition">
-                        Tiếp theo: Âm thanh & Định vị →
-                    </button>
-                </div>
-            </div>
-
-            <!-- Section 2 -->
-            <div id="section-2" class="content-section hidden bg-white rounded-2xl shadow-sm border border-sky-100 p-6 md:p-8">
-                <div class="border-b border-gray-100 pb-4 mb-6">
-                    <span class="inline-block px-3 py-1 bg-sky-100 text-sky-800 rounded-full text-xs font-semibold mb-2">Phần 2 / 7</span>
-                    <h2 class="text-2xl font-bold text-slate-900">2. Âm thanh và khả năng định vị</h2>
-                    <p class="text-sm text-slate-500 mt-1">Mục tiêu: Hiểu tần số, bước sóng và lý do dơi sử dụng sóng siêu âm.</p>
-                </div>
-
-                <div class="space-y-4 text-sm text-slate-700 leading-relaxed">
-                    <p>Âm thanh có những đặc điểm quan trọng như tần số và bước sóng:</p>
-                    <ul class="list-disc list-inside space-y-1 pl-2">
-                        <li><strong>Tần số (Frequency):</strong> Số lần dao động của sóng âm trong một giây (đơn vị Hz).</li>
-                        <li><strong>Bước sóng (Wavelength):</strong> Khoảng cách giữa hai điểm tương ứng liên tiếp của sóng.</li>
-                        <li><strong>Sóng siêu âm (Ultrasound):</strong> Âm thanh có tần số trên <strong>20.000 Hz</strong>.</li>
+            <!-- Objectives & Stats Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Objectives Card -->
+                <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-bullseye text-blue-500"></i> Learning Objectives
+                    </h3>
+                    <ul class="space-y-3 text-sm text-slate-600">
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-circle-check text-green-500 mt-0.5"></i>
+                            <span>Explain how bats use <strong>echolocation</strong> to navigate and hunt prey in total darkness.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-circle-check text-green-500 mt-0.5"></i>
+                            <span>Understand the basic characteristics of <strong>sound waves</strong> (frequency, wavelength, ultrasound).</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-circle-check text-green-500 mt-0.5"></i>
+                            <span>Identify specialized <strong>physical adaptations</strong> (larynx, cochlea, tragus, nose-leaf) that detect sound.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-circle-check text-green-500 mt-0.5"></i>
+                            <span>Describe different <strong>dietary adaptations</strong> in bats (insectivorous, frugivorous, sanguivorous).</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-circle-check text-green-500 mt-0.5"></i>
+                            <span>Explain <strong>convergent evolution</strong> using bats and dolphins as key scientific examples.</span>
+                        </li>
                     </ul>
-                    <p>Dơi thường sử dụng âm thanh trong khoảng <strong>20–60 kHz</strong> để định vị.</p>
-
-                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 my-4">
-                        <h4 class="font-bold text-amber-900 mb-1">💡 Tại sao dơi sử dụng tần số cao?</h4>
-                        <p class="text-amber-800 text-xs leading-relaxed">
-                            Sóng âm tần số cao có bước sóng ngắn, giúp phát hiện những vật thể rất nhỏ như côn trùng. Tuy nhiên, nếu tần số quá thấp sẽ khó phát hiện vật thể nhỏ, còn nếu tần số quá cao thì âm thanh suy giảm nhanh trong không khí, khiến phạm vi định vị bị ngắn hơn.
-                        </p>
-                    </div>
-
-                    <p>
-                        Dơi xác định khoảng cách đến mục tiêu bằng cách đo <strong>thời gian</strong> từ khi phát âm thanh đến khi nhận được âm phản hồi.
-                    </p>
                 </div>
 
-                <div class="mt-8 pt-4 border-t border-gray-100 flex justify-between items-center">
-                    <button onclick="markSectionComplete(2)" id="btn-complete-2" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow transition">
-                        ✓ Đánh dấu đã học phần này
+                <!-- Overall Progress Card -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie text-blue-500"></i> Overall Progress
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-xs font-semibold text-slate-600 mb-1">
+                                    <span>Lesson Reading</span>
+                                    <span id="prog-lesson-text">0/6 Sections</span>
+                                </div>
+                                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                                    <div id="prog-lesson-bar" class="bg-blue-500 h-full w-0 transition-all duration-500"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs font-semibold text-slate-600 mb-1">
+                                    <span>Vocabulary Mastered</span>
+                                    <span id="prog-vocab-text">0/10 Words</span>
+                                </div>
+                                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                                    <div id="prog-vocab-bar" class="bg-green-500 h-full w-0 transition-all duration-500"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs font-semibold text-slate-600 mb-1">
+                                    <span>Comprehension Practice</span>
+                                    <span id="prog-practice-text">0 Completed</span>
+                                </div>
+                                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                                    <div id="prog-practice-bar" class="bg-purple-500 h-full w-0 transition-all duration-500"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs font-semibold text-slate-600 mb-1">
+                                    <span>Final Quiz Best Score</span>
+                                    <span id="prog-quiz-text">Not Attempted</span>
+                                </div>
+                                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                                    <div id="prog-quiz-bar" class="bg-amber-500 h-full w-0 transition-all duration-500"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500">
+                        <span>Data saved automatically</span>
+                        <button onclick="resetAllProgress()" class="text-red-500 hover:text-red-700 underline font-medium">Reset Progress</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. LESSON CONTENT SECTION -->
+        <section id="sec-lesson" class="hidden space-y-6">
+            <!-- Sub-Navigation for Sections -->
+            <div class="flex flex-wrap gap-2 pb-2 border-b border-slate-200">
+                <button onclick="showSection(1)" id="sec-btn-1" class="lesson-sec-btn px-4 py-2 rounded-lg text-sm font-semibold bg-blue-500 text-white shadow-sm">1. Echolocation</button>
+                <button onclick="showSection(2)" id="sec-btn-2" class="lesson-sec-btn px-4 py-2 rounded-lg text-sm font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">2. Sound & Navigation</button>
+                <button onclick="showSection(3)" id="sec-btn-3" class="lesson-sec-btn px-4 py-2 rounded-lg text-sm font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">3. Physical Adaptations</button>
+                <button onclick="showSection(4)" id="sec-btn-4" class="lesson-sec-btn px-4 py-2 rounded-lg text-sm font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">4. Hunting Signals</button>
+                <button onclick="showSection(5)" id="sec-btn-5" class="lesson-sec-btn px-4 py-2 rounded-lg text-sm font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">5. Evolutionary Diversity</button>
+                <button onclick="showSection(6)" id="sec-btn-6" class="lesson-sec-btn px-4 py-2 rounded-lg text-sm font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">6. Convergent Evolution</button>
+            </div>
+
+            <!-- SECTION CONTENT CARDS -->
+            <div id="lesson-card-container" class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 min-h-[450px] flex flex-col justify-between">
+                <div id="lesson-text-content" class="space-y-4 leading-relaxed text-slate-700">
+                    <!-- Injected dynamically by JS -->
+                </div>
+
+                <!-- Section Navigation & Mark as Read -->
+                <div class="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <button id="lesson-prev-btn" onclick="navSection(-1)" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg text-sm transition">
+                            <i class="fa-solid fa-chevron-left mr-1"></i> Previous
+                        </button>
+                        <button id="lesson-next-btn" onclick="navSection(1)" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg text-sm transition">
+                            Next <i class="fa-solid fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+                    <button id="mark-section-btn" onclick="toggleSectionComplete()" class="px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl shadow transition flex items-center gap-2">
+                        <i class="fa-solid fa-check"></i> <span>Mark Section Complete</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mini Check Quick Quiz for current section -->
+            <div class="bg-blue-50/50 border border-blue-100 rounded-2xl p-6">
+                <h4 class="text-sm font-bold text-blue-900 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-lightbulb text-amber-500"></i> Quick Check
+                </h4>
+                <div id="section-check-container" class="space-y-3">
+                    <!-- Injected dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. VOCABULARY SECTION -->
+        <section id="sec-vocab" class="hidden space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">B1–B2 Scientific Vocabulary</h2>
+                    <p class="text-sm text-slate-500">Interactive flashcards with IPA, collocations, and Vietnamese meanings.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-semibold text-slate-500">Mode:</span>
+                    <button id="vocab-filter-all" onclick="filterVocab('all')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-500 text-white">All (10)</button>
+                    <button id="vocab-filter-learning" onclick="filterVocab('need')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200">Need Practice</button>
+                </div>
+            </div>
+
+            <!-- Flashcard Display -->
+            <div class="max-w-md mx-auto">
+                <div id="flashcard-element" class="flashcard cursor-pointer h-72 w-full perspective" onclick="flipCard()">
+                    <div class="flashcard-inner relative w-full h-full text-center rounded-2xl shadow-md border border-slate-200 bg-white p-6 flex flex-col justify-between">
+                        <!-- Front of card -->
+                        <div class="flashcard-front absolute inset-0 p-6 flex flex-col justify-between bg-white rounded-2xl">
+                            <div class="flex justify-between items-center text-xs text-slate-400">
+                                <span id="fc-category">Scientific Term</span>
+                                <span id="fc-counter">1 / 10</span>
+                            </div>
+                            <div class="my-auto">
+                                <h3 id="fc-word" class="text-3xl font-extrabold text-blue-600 mb-1">Echolocation</h3>
+                                <p id="fc-ipa" class="text-sm text-slate-500 font-mono mb-2">/ˌek.əʊ.ləʊˈkeɪ.ʃən/</p>
+                                <span id="fc-pos" class="inline-block bg-blue-50 text-blue-600 text-xs px-2.5 py-0.5 rounded-full font-medium">noun</span>
+                            </div>
+                            <p class="text-xs text-slate-400 italic">Click card to reveal definition & Vietnamese meaning</p>
+                        </div>
+                        <!-- Back of card -->
+                        <div class="flashcard-back absolute inset-0 p-6 flex flex-col justify-between bg-slate-900 text-white rounded-2xl">
+                            <div class="text-left space-y-2 text-xs">
+                                <p class="text-amber-400 font-bold uppercase tracking-wider">Definition</p>
+                                <p id="fc-def" class="text-slate-200 leading-snug">Finding distance and location of objects using reflected sound waves.</p>
+                                <p class="text-blue-300 font-bold uppercase tracking-wider pt-1">Tiếng Việt</p>
+                                <p id="fc-vi" class="text-white font-semibold text-sm">Sự định vị bằng tiếng vang</p>
+                            </div>
+                            <div class="text-left text-xs text-slate-300 bg-slate-800 p-2.5 rounded-lg">
+                                <span class="font-bold text-slate-400">Example:</span>
+                                <p id="fc-example" class="italic text-slate-200 mt-0.5">"Bats rely on echolocation to hunt in pitch darkness."</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Flashcard Controls -->
+                <div class="flex items-center justify-between mt-6">
+                    <button onclick="prevCard()" class="p-3 bg-white hover:bg-slate-100 rounded-xl shadow border border-slate-200 text-slate-700">
+                        <i class="fa-solid fa-chevron-left text-lg"></i>
                     </button>
                     <div class="flex gap-2">
-                        <button onclick="switchSection(1)" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-slate-700 text-xs font-semibold rounded-lg transition">← Quay lại</button>
-                        <button onclick="switchSection(3)" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-lg shadow transition">Tiếp theo →</button>
+                        <button onclick="markCardStatus(false)" class="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 font-semibold rounded-xl text-xs border border-red-200 flex items-center gap-1.5">
+                            <i class="fa-solid fa-xmark"></i> Need Practice
+                        </button>
+                        <button onclick="markCardStatus(true)" class="px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 font-semibold rounded-xl text-xs border border-green-200 flex items-center gap-1.5">
+                            <i class="fa-solid fa-check"></i> Mastered
+                        </button>
+                    </div>
+                    <button onclick="nextCard()" class="p-3 bg-white hover:bg-slate-100 rounded-xl shadow border border-slate-200 text-slate-700">
+                        <i class="fa-solid fa-chevron-right text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Vocabulary Table List -->
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm mt-8">
+                <div class="p-4 bg-slate-50 border-b border-slate-200 font-bold text-slate-800 text-sm">
+                    Complete Vocabulary List & Collocations
+                </div>
+                <div class="divide-y divide-slate-100 overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50/50 text-slate-500 uppercase text-[11px] font-semibold">
+                            <tr>
+                                <th class="p-3">Word / Term</th>
+                                <th class="p-3">IPA & POS</th>
+                                <th class="p-3">English Definition</th>
+                                <th class="p-3">Meaning (VN)</th>
+                                <th class="p-3">Collocations</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vocab-table-body">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. COMPREHENSION ACTIVITIES SECTION -->
+        <section id="sec-practice" class="hidden space-y-6">
+            <!-- Activity Selector Tabs -->
+            <div class="flex flex-wrap gap-2">
+                <button onclick="switchPractice('mcq')" id="p-tab-mcq" class="practice-tab px-4 py-2 rounded-xl text-sm font-semibold bg-blue-500 text-white shadow-sm">Multiple Choice</button>
+                <button onclick="switchPractice('tf')" id="p-tab-tf" class="practice-tab px-4 py-2 rounded-xl text-sm font-semibold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100">True / False</button>
+                <button onclick="switchPractice('match')" id="p-tab-match" class="practice-tab px-4 py-2 rounded-xl text-sm font-semibold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100">Term Matching</button>
+                <button onclick="switchPractice('fill')" id="p-tab-fill" class="practice-tab px-4 py-2 rounded-xl text-sm font-semibold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100">Fill in Blanks</button>
+            </div>
+
+            <!-- Container for current activity -->
+            <div id="practice-container" class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 min-h-[400px]">
+                <!-- Dynamically populated -->
+            </div>
+        </section>
+
+        <!-- 5. FINAL QUIZ SECTION -->
+        <section id="sec-quiz" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm max-w-3xl mx-auto">
+                <!-- Quiz Header -->
+                <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Final Assessment Quiz</h2>
+                        <p class="text-xs text-slate-500">20 Questions covering all 6 lesson sections</p>
+                    </div>
+                    <div id="quiz-progress-badge" class="px-3 py-1 bg-blue-50 text-blue-600 font-bold rounded-lg text-sm">
+                        Question 1 / 20
+                    </div>
+                </div>
+
+                <!-- Quiz Active Body -->
+                <div id="quiz-active-area">
+                    <div id="quiz-question-box" class="text-base font-semibold text-slate-800 mb-6 leading-snug">
+                        <!-- Question content -->
+                    </div>
+
+                    <div id="quiz-options-box" class="space-y-3 mb-8">
+                        <!-- Options buttons injected here -->
+                    </div>
+
+                    <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                        <button id="quiz-prev-btn" onclick="navQuiz(-1)" class="px-4 py-2 bg-slate-100 text-slate-600 font-medium rounded-xl text-sm hover:bg-slate-200">Previous</button>
+                        <button id="quiz-next-btn" onclick="navQuiz(1)" class="px-5 py-2.5 bg-blue-600 text-white font-bold rounded-xl text-sm hover:bg-blue-700 shadow">Next</button>
+                        <button id="quiz-submit-btn" onclick="submitQuiz()" class="hidden px-6 py-2.5 bg-green-500 text-white font-bold rounded-xl text-sm hover:bg-green-600 shadow">Submit Quiz</button>
+                    </div>
+                </div>
+
+                <!-- Quiz Results Area (Initially Hidden) -->
+                <div id="quiz-result-area" class="hidden text-center space-y-6 py-4">
+                    <div class="w-24 h-24 mx-auto rounded-full bg-blue-50 flex items-center justify-center border-4 border-blue-500 text-blue-600">
+                        <span id="quiz-score-percent" class="text-2xl font-black">0%</span>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-slate-800">Quiz Completed!</h3>
+                        <p id="quiz-score-details" class="text-sm text-slate-500 mt-1">You scored 0 out of 20 correctly.</p>
+                    </div>
+                    <div class="flex justify-center gap-4">
+                        <button onclick="resetQuiz()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm shadow">
+                            <i class="fa-solid fa-rotate-right mr-1"></i> Retake Quiz
+                        </button>
+                        <button onclick="toggleQuizReview()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm">
+                            Review Answers
+                        </button>
+                    </div>
+                    <!-- Detailed Answers Review Container -->
+                    <div id="quiz-review-container" class="hidden text-left space-y-4 pt-6 border-t border-slate-200">
+                        <h4 class="font-bold text-slate-800">Answer Key & Explanations:</h4>
+                        <div id="quiz-review-list" class="space-y-4 max-h-96 overflow-y-auto pr-2">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. ENGLISH SPEAKING PRACTICE SECTION -->
+        <section id="sec-speaking" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-800 mb-1">Speaking & Self-Expressive Practice</h2>
+                <p class="text-sm text-slate-500">Practice explaining scientific concepts in your own words using B1–B2 sentence frames.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Prompt Selector & Model Answer Card -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Select Speaking Prompt</label>
+                    <select id="speaking-select" onchange="loadSpeakingPrompt()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="0">1. What is echolocation?</option>
+                        <option value="1">2. How do bats use sound to locate prey?</option>
+                        <option value="2">3. Why do bats use high-frequency sounds?</option>
+                        <option value="3">4. What physical adaptations help bats detect echoes?</option>
+                        <option value="4">5. How are bats and dolphins similar?</option>
+                        <option value="5">6. What is convergent evolution?</option>
+                    </select>
+
+                    <div class="space-y-3 pt-2">
+                        <div class="p-4 bg-blue-50/70 border border-blue-100 rounded-xl">
+                            <span class="text-xs font-bold text-blue-600 uppercase">Model B1-B2 Answer</span>
+                            <p id="spk-model-ans" class="text-sm text-slate-700 italic mt-1 leading-relaxed">
+                                <!-- Model answer injected -->
+                            </p>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-slate-500 uppercase">Useful Vocabulary</span>
+                            <div id="spk-vocab-tags" class="flex flex-wrap gap-1.5 mt-1.5">
+                                <!-- Tags injected -->
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-slate-500 uppercase">Suggested Sentence Frame</span>
+                            <p id="spk-frame" class="text-xs text-slate-600 font-mono bg-slate-50 p-2.5 rounded-lg border border-slate-200 mt-1">
+                                <!-- Frame injected -->
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Interactive Input Card -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Type or Draft Your Answer Here</label>
+                        <textarea id="spk-user-input" rows="5" placeholder="Type your response in English..." class="w-full p-3 border border-slate-200 rounded-xl text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                    </div>
+
+                    <!-- Self-Assessment Checklist -->
+                    <div class="bg-slate-50 p-4 rounded-xl space-y-2 border border-slate-200">
+                        <span class="text-xs font-bold text-slate-700 uppercase">Self-Assessment Checklist:</span>
+                        <div class="space-y-1.5 text-xs text-slate-600">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="chk-1" class="rounded text-blue-500 focus:ring-blue-400">
+                                <span>I included key terms (e.g., sound waves, echoes).</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="chk-2" class="rounded text-blue-500 focus:ring-blue-400">
+                                <span>I used clear B1–B2 connectives (e.g., because, although, allows them to).</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="chk-3" class="rounded text-blue-500 focus:ring-blue-400">
+                                <span>My sentence structure is grammatically accurate.</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button onclick="saveSpeakingResponse()" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm shadow transition">
+                        Save Response Progress
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. FINAL REVIEW SECTION -->
+        <section id="sec-review" class="hidden space-y-6">
+            <!-- 5 Key Scientific Concepts -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-4">
+                <h2 class="text-xl font-bold text-slate-800">5 Key Scientific Takeaways</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="p-4 rounded-xl bg-blue-50/50 border border-blue-100">
+                        <span class="text-xs font-bold text-blue-600 uppercase">1. Echolocation</span>
+                        <p class="text-sm text-slate-700 mt-1">Bats produce high-frequency sound waves that bounce off objects, allowing them to map their dark surroundings.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-blue-50/50 border border-blue-100">
+                        <span class="text-xs font-bold text-blue-600 uppercase">2. Ultrasound</span>
+                        <p class="text-sm text-slate-700 mt-1">Frequencies above 20 kHz provide short wavelengths needed to reflect off small insects like moths.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-blue-50/50 border border-blue-100">
+                        <span class="text-xs font-bold text-blue-600 uppercase">3. Physical Adaptations</span>
+                        <p class="text-sm text-slate-700 mt-1">Body parts like the larynx (sound producer), tragus (direction indicator), and cochlea (signal converter) work together.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-blue-50/50 border border-blue-100">
+                        <span class="text-xs font-bold text-blue-600 uppercase">4. Dietary Diversity</span>
+                        <p class="text-sm text-slate-700 mt-1">Adaptations include long tongues for nectar, iron processing for vampire bats, and sugar regulation for fruit bats.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-blue-50/50 border border-blue-100">
+                        <span class="text-xs font-bold text-blue-600 uppercase">5. Convergent Evolution</span>
+                        <p class="text-sm text-slate-700 mt-1">Unrelated organisms (bats in air, dolphins in water) independently evolved echolocation to solve similar challenges.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Section 3 -->
-            <div id="section-3" class="content-section hidden bg-white rounded-2xl shadow-sm border border-sky-100 p-6 md:p-8">
-                <div class="border-b border-gray-100 pb-4 mb-6">
-                    <span class="inline-block px-3 py-1 bg-sky-100 text-sky-800 rounded-full text-xs font-semibold mb-2">Phần 3 / 7</span>
-                    <h2 class="text-2xl font-bold text-slate-900">3. Cấu tạo cơ thể giúp dơi định vị</h2>
-                    <p class="text-sm text-slate-500 mt-1">Mục tiêu: Khám phá các bộ phận sinh học chuyên hóa giúp dơi phát và thu nhận siêu âm.</p>
+            <!-- Final Task Explanation Box -->
+            <div class="bg-gradient-to-br from-slate-900 to-indigo-950 rounded-2xl p-6 sm:p-8 text-white shadow-xl space-y-4">
+                <div>
+                    <span class="inline-block px-3 py-1 bg-amber-400 text-slate-950 font-extrabold text-xs rounded-full uppercase mb-2">Final Learning Challenge</span>
+                    <h3 class="text-2xl font-bold">Explain the Entire Lesson in Your Own Words</h3>
+                    <p class="text-slate-300 text-sm mt-1">Summarize how bats use sound, their body structures, and their evolutionary traits without looking back at the text.</p>
                 </div>
 
-                <div class="space-y-4 text-sm text-slate-700 leading-relaxed">
-                    <p>Cơ thể dơi sở hữu các bộ phận quan trọng chuyên biệt cho việc định vị bằng âm thanh:</p>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div class="p-3 bg-sky-50 rounded-xl border border-sky-100">
-                            <strong class="text-sky-900 block mb-1">🎤 Thanh quản (Larynx)</strong>
-                            <span class="text-xs text-slate-600">Giúp tạo ra âm thanh tần số cao.</span>
-                        </div>
-                        <div class="p-3 bg-sky-50 rounded-xl border border-sky-100">
-                            <strong class="text-sky-900 block mb-1">👂 Tai (Ears)</strong>
-                            <span class="text-xs text-slate-600">Thu nhận âm phản hồi cực nhạy.</span>
-                        </div>
-                        <div class="p-3 bg-sky-50 rounded-xl border border-sky-100">
-                            <strong class="text-sky-900 block mb-1">🐚 Ốc tai (Cochlea)</strong>
-                            <span class="text-xs text-slate-600">Tiếp nhận và xử lý tín hiệu âm thanh phức tạp.</span>
-                        </div>
-                        <div class="p-3 bg-sky-50 rounded-xl border border-sky-100">
-                            <strong class="text-sky-900 block mb-1">🔸 Tragus (Nắp tai)</strong>
-                            <span class="text-xs text-slate-600">Mẩu sụn nhỏ ở tai giúp xác định hướng âm thanh.</span>
-                        </div>
-                    </div>
+                <textarea id="final-summary-input" rows="6" placeholder="Write your full lesson summary in English here..." class="w-full p-4 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-400"></textarea>
 
-                    <div class="p-3 bg-sky-50 rounded-xl border border-sky-100 mt-3">
-                        <strong class="text-sky-900 block mb-1">👃 Lá mũi (Nose-leaf)</strong>
-                        <span class="text-xs text-slate-600">Cấu trúc da đặc biệt giúp một số loài dơi định hướng âm thanh phát ra từ mũi.</span>
-                    </div>
-
-                    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mt-4">
-                        <h4 class="font-bold text-emerald-900 mb-1">🛡️ Cơ chế bảo vệ thính giác</h4>
-                        <p class="text-emerald-800 text-xs leading-relaxed">
-                            Khi phát ra âm thanh cường độ lớn để định vị, các cơ trong tai dơi tự động co lại để giảm tác động của âm thanh cực lớn đó lên chính hệ thống nghe của chúng, tránh bị điếc tạm thời.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="mt-8 pt-4 border-t border-gray-100 flex justify-between items-center">
-                    <button onclick="markSectionComplete(3)" id="btn-complete-3" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow transition">
-                        ✓ Đánh dấu đã học phần này
+                <div class="flex justify-between items-center">
+                    <span id="summary-saved-status" class="text-xs text-green-400 font-medium"></span>
+                    <button onclick="saveFinalSummary()" class="px-6 py-3 bg-blue-500 hover:bg-blue-600 font-bold rounded-xl text-sm shadow transition">
+                        Save Final Summary
                     </button>
-                    <div class="flex gap-2">
-                        <button onclick="switchSection(2)" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-slate-700 text-xs font-semibold rounded-lg transition">← Quay lại</button>
-                        <button onclick="switchSection(4)" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-lg shadow transition">Tiếp theo →</button>
-                    </div>
                 </div>
             </div>
+        </section>
 
-            <!-- Section 4 -->
-            <div id="section-4" class="content-section hidden bg-white rounded-2xl shadow-sm border border-sky-100 p-6 md:p-8">
-                <div class="border-b border-gray-100 pb-4 mb-6">
-                    <span class="inline-block px-3 py-1 bg-sky-100 text-sky-800 rounded-full text-xs font-semibold mb-2">Phần 4 / 7</span>
-                    <h2 class="text-2xl font-bold text-slate-900">4. Các dạng âm thanh và quá trình săn mồi</h2>
-                    <p class="text-sm text-slate-500 mt-1">Mục tiêu: Nắm vững các tín hiệu Narrowband, Broadband và 3 giai đoạn săn mồi.</p>
-                </div>
+    </main>
 
-                <div class="space-y-4 text-sm text-slate-700 leading-relaxed">
-                    <p>Dơi sử dụng hai dạng tín hiệu âm thanh chính:</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
-                            <strong class="text-slate-900 block mb-1">Narrowband (CF) – Âm thanh băng hẹp</strong>
-                            <p class="text-xs text-slate-600">Duy trì tần số gần như không đổi. Giúp dơi phát hiện và nhận biết đặc điểm chuyển động của con mồi.</p>
-                        </div>
-                        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
-                            <strong class="text-slate-900 block mb-1">Broadband (FM) – Âm thanh băng rộng</strong>
-                            <p class="text-xs text-slate-600">Tần số thay đổi nhanh. Giúp dơi xác định khoảng cách và vị trí vật thể cực kỳ chính xác.</p>
-                        </div>
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>BioEnglish Learning Platform • Designed for B1–B2 Vietnamese Learners</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // DATA STRUCTURES
+
+        // 1. Lesson Sections Content
+        const lessonSections = [
+            {
+                id: 1,
+                title: "1. Echolocation",
+                content: `
+                    <p class="text-base text-slate-700">Bats are mammals and the only mammals capable of <strong>true powered flight</strong>. Many species are active at night (nocturnal) and use a special biological ability called <strong>echolocation</strong>.</p>
+                    <div class="my-4 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                        <h4 class="font-bold text-blue-900 text-sm mb-1">What is Echolocation?</h4>
+                        <p class="text-sm text-slate-700">Echolocation is a biological process in which animals use <strong>reflected sound waves</strong> to identify the location, distance, and movement of objects around them.</p>
                     </div>
-
-                    <h4 class="font-bold text-slate-800 pt-2">🎯 Ba giai đoạn săn mồi của dơi:</h4>
-                    <div class="space-y-2">
-                        <div class="flex items-start gap-3 p-3 bg-sky-50 rounded-xl border border-sky-100">
-                            <span class="bg-sky-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
-                            <div>
-                                <strong class="text-sky-900 text-xs uppercase tracking-wider block">Search (Tìm kiếm)</strong>
-                                <span class="text-xs text-slate-600">Tìm kiếm con mồi bằng các xung âm thanh tương đối chậm.</span>
-                            </div>
-                        </div>
-                        <div class="flex items-start gap-3 p-3 bg-sky-50 rounded-xl border border-sky-100">
-                            <span class="bg-sky-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
-                            <div>
-                                <strong class="text-sky-900 text-xs uppercase tracking-wider block">Approach (Tiếp cận)</strong>
-                                <span class="text-xs text-slate-600">Tăng tốc độ phát âm khi phát hiện con mồi.</span>
-                            </div>
-                        </div>
-                        <div class="flex items-start gap-3 p-3 bg-sky-50 rounded-xl border border-sky-100">
-                            <span class="bg-sky-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
-                            <div>
-                                <strong class="text-sky-900 text-xs uppercase tracking-wider block">Terminal Buzz (Tấn công chớp nhoáng)</strong>
-                                <span class="text-xs text-slate-600">Phát âm thanh rất nhanh, lên tới 200 xung/giây, ngay trước khi bắt mồi.</span>
-                            </div>
-                        </div>
+                    <h4 class="font-bold text-slate-800 text-sm mt-4 mb-2">How Does Echolocation Work?</h4>
+                    <p class="text-sm text-slate-700 mb-2">The process involves three main steps:</p>
+                    <ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">
+                        <li><strong>Sound emission:</strong> Bats produce high-frequency sounds.</li>
+                        <li><strong>Sound reflection:</strong> The sounds hit objects and bounce back as echoes.</li>
+                        <li><strong>Echo reception:</strong> Bats receive returning echoes to map their surroundings.</li>
+                    </ul>
+                    <div class="mt-4 p-3 bg-amber-50 rounded-lg text-xs text-amber-900 border border-amber-200">
+                        <strong>Example:</strong> When a moth flies nearby, a bat emits ultrasound. The sound bounces off the moth and returns to the bat's ears, revealing the exact location and movement of the insect.
                     </div>
-
-                    <p class="text-xs text-slate-500 italic mt-2">
-                        * Một số loài dơi móng ngựa còn sử dụng <strong>Doppler Shift Compensation (DSC)</strong> – cơ chế điều chỉnh tần số âm thanh để bù lại sự thay đổi do chuyển động khi bay.
-                    </p>
-                </div>
-
-                <div class="mt-8 pt-4 border-t border-gray-100 flex justify-between items-center">
-                    <button onclick="markSectionComplete(4)" id="btn-complete-4" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow transition">
-                        ✓ Đánh dấu đã học phần này
-                    </button>
-                    <div class="flex gap-2">
-                        <button onclick="switchSection(3)" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-slate-700 text-xs font-semibold rounded-lg transition">← Quay lại</button>
-                        <button onclick="switchSection(5)" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-lg shadow transition">Tiếp theo →</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Section 5 -->
-            <div id="section-5" class="content-section hidden bg-white rounded-2xl shadow-sm border border-sky-100 p-6 md:p-8">
-                <div class="border-b border-gray-100 pb-4 mb-6">
-                    <span class="inline-block px-3 py-1 bg-sky-100 text-sky-800 rounded-full text-xs font-semibold mb-2">Phần 5 / 7</span>
-                    <h2 class="text-2xl font-bold text-slate-900">5. Tiến hóa và sự đa dạng chế độ ăn</h2>
-                    <p class="text-sm text-slate-500 mt-1">Mục tiêu: Hiểu sự tiến hóa trên 50 triệu năm và các nhóm dơi theo nguồn thức ăn.</p>
-                </div>
-
-                <div class="space-y-4 text-sm text-slate-700 leading-relaxed">
-                    <p>
-                        Dơi đã xuất hiện cách đây hơn <strong>50 triệu năm</strong>. Qua quá trình tiến hóa, chúng thích nghi với nhiều môi trường sống và nguồn thức ăn khác nhau.
-                    </p>
-
-                    <!-- Table of diets -->
-                    <div class="overflow-x-auto border border-slate-200 rounded-xl my-4">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead>
-                                <tr class="bg-sky-50 text-sky-900 border-b border-sky-200">
-                                    <th class="p-3 font-bold">Nhóm dơi</th>
-                                    <th class="p-3 font-bold">Thức ăn</th>
-                                    <th class="p-3 font-bold">Đặc điểm / Thích nghi</th>
-                                </tr>
+                    <h4 class="font-bold text-slate-800 text-sm mt-4 mb-2">History of Discovery</h4>
+                    <ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">
+                        <li><strong>1793 – Lazzaro Spallanzani:</strong> Demonstrated that blind bats could navigate easily, whereas deaf bats struggled severely.</li>
+                        <li><strong>1938 – Donald R. Griffin:</strong> Coined the scientific term <em>echolocation</em>.</li>
+                    </ul>
+                `,
+                check: {
+                    q: "Who introduced the term 'echolocation' in 1938?",
+                    opts: ["Lazzaro Spallanzani", "Donald R. Griffin", "Charles Darwin"],
+                    ans: 1
+                }
+            },
+            {
+                id: 2,
+                title: "2. Sound and Navigation",
+                content: `
+                    <p class="text-sm text-slate-700">Sound has key physical characteristics, including <strong>frequency</strong> and <strong>wavelength</strong>.</p>
+                    <div class="overflow-x-auto my-4">
+                        <table class="w-full text-left text-xs border border-slate-200 rounded-lg overflow-hidden">
+                            <thead class="bg-slate-100 font-bold text-slate-700">
+                                <tr><th class="p-2 border-b">Term</th><th class="p-2 border-b">Definition</th></tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-100 text-slate-700">
-                                <tr>
-                                    <td class="p-3 font-semibold text-slate-900">Insectivorous</td>
-                                    <td class="p-3">Côn trùng</td>
-                                    <td class="p-3">Săn muỗi, bướm và côn trùng bằng echolocation.</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-3 font-semibold text-slate-900">Frugivorous</td>
-                                    <td class="p-3">Trái cây</td>
-                                    <td class="p-3">Hàm khỏe, ăn nhiều loại quả, điều hòa đường huyết tốt.</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-3 font-semibold text-slate-900">Nectarivorous</td>
-                                    <td class="p-3">Mật hoa</td>
-                                    <td class="p-3">Lưỡi dài để hút mật, giúp thụ phấn cho hoa.</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-3 font-semibold text-slate-900">Carnivorous</td>
-                                    <td class="p-3">Thịt</td>
-                                    <td class="p-3">Săn động vật nhỏ (ếch, thằn lằn, dơi khác).</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-3 font-semibold text-slate-900">Piscivorous</td>
-                                    <td class="p-3">Cá</td>
-                                    <td class="p-3">Bắt cá trên mặt nước bằng móng chân lớn.</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-3 font-semibold text-slate-900">Sanguivorous</td>
-                                    <td class="p-3">Máu</td>
-                                    <td class="p-3">Thích nghi hút máu, đào thải sắt dư thừa, cảm nhận nhiệt.</td>
-                                </tr>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr><td class="p-2 font-bold text-blue-600">Frequency</td><td class="p-2">Number of sound-wave vibrations per second.</td></tr>
+                                <tr><td class="p-2 font-bold text-blue-600">Wavelength</td><td class="p-2">Distance between two consecutive points on a wave.</td></tr>
+                                <tr><td class="p-2 font-bold text-blue-600">Ultrasound</td><td class="p-2">Sound frequency above 20,000 Hertz (20 kHz).</td></tr>
+                                <tr><td class="p-2 font-bold text-blue-600">Hertz (Hz) / kHz</td><td class="p-2">Units of frequency (1 kHz = 1,000 Hz).</td></tr>
                             </tbody>
                         </table>
                     </div>
-
-                    <p>
-                        Tiến hóa vẫn đang diễn ra. Những khác biệt về kích thước, hình thái và tập tính giữa các quần thể góp phần hình thành loài mới.
-                    </p>
-                </div>
-
-                <div class="mt-8 pt-4 border-t border-gray-100 flex justify-between items-center">
-                    <button onclick="markSectionComplete(5)" id="btn-complete-5" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow transition">
-                        ✓ Đánh dấu đã học phần này
-                    </button>
-                    <div class="flex gap-2">
-                        <button onclick="switchSection(4)" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-slate-700 text-xs font-semibold rounded-lg transition">← Quay lại</button>
-                        <button onclick="switchSection(6)" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-lg shadow transition">Tiếp theo →</button>
+                    <p class="text-sm text-slate-700 mb-2">Bats commonly use sound frequencies between <strong>20–60 kHz</strong>.</p>
+                    <h4 class="font-bold text-slate-800 text-sm mt-3 mb-1">Why High Frequency?</h4>
+                    <p class="text-sm text-slate-700">High-frequency sounds have <strong>shorter wavelengths</strong>, making them capable of reflecting off tiny objects like mosquitoes.</p>
+                    <ul class="list-disc pl-5 text-xs text-slate-600 mt-2 space-y-1">
+                        <li><em>Too low frequency:</em> Waves pass around small insects without bouncing back.</li>
+                        <li><em>Too high frequency:</em> Waves attenuate (lose energy) rapidly in the air, limiting range.</li>
+                    </ul>
+                    <h4 class="font-bold text-slate-800 text-sm mt-3 mb-1">Measuring Distance</h4>
+                    <p class="text-sm text-slate-700">Bats determine distance by calculating the <strong>time delay</strong> between sending a sound pulse and receiving the echo.</p>
+                `,
+                check: {
+                    q: "Why do bats use high-frequency sounds instead of low-frequency sounds?",
+                    opts: ["They travel farther in air", "Shorter wavelengths detect small insects", "They are quieter"],
+                    ans: 1
+                }
+            },
+            {
+                id: 3,
+                title: "3. Physical Adaptations for Echolocation",
+                content: `
+                    <p class="text-sm text-slate-700">Bats possess highly specialized biological structures designed to emit and capture sound waves efficiently.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 my-4">
+                        <div class="p-3 border rounded-xl bg-slate-50"><strong class="text-blue-600 text-sm">Larynx:</strong> <span class="text-xs text-slate-600">Vocal organ that generates ultrasound pulses.</span></div>
+                        <div class="p-3 border rounded-xl bg-slate-50"><strong class="text-blue-600 text-sm">Ears:</strong> <span class="text-xs text-slate-600">Large, complex structures to gather weak returning echoes.</span></div>
+                        <div class="p-3 border rounded-xl bg-slate-50"><strong class="text-blue-600 text-sm">Cochlea:</strong> <span class="text-xs text-slate-600">Inner ear organ converting vibrations into nerve signals.</span></div>
+                        <div class="p-3 border rounded-xl bg-slate-50"><strong class="text-blue-600 text-sm">Tragus:</strong> <span class="text-xs text-slate-600">Flap inside ear helping determine vertical sound direction.</span></div>
+                        <div class="p-3 border rounded-xl bg-slate-50 sm:col-span-2"><strong class="text-blue-600 text-sm">Nose-leaf:</strong> <span class="text-xs text-slate-600">Fleshy structure directing sound emitted through nostrils.</span></div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Section 6 -->
-            <div id="section-6" class="content-section hidden bg-white rounded-2xl shadow-sm border border-sky-100 p-6 md:p-8">
-                <div class="border-b border-gray-100 pb-4 mb-6">
-                    <span class="inline-block px-3 py-1 bg-sky-100 text-sky-800 rounded-full text-xs font-semibold mb-2">Phần 6 / 7</span>
-                    <h2 class="text-2xl font-bold text-slate-900">6. Dơi và cá heo: Tiến hóa hội tụ</h2>
-                    <p class="text-sm text-slate-500 mt-1">Mục tiêu: So sánh khả năng định vị ở dơi và cá heo, hiểu khái niệm Convergent Evolution.</p>
-                </div>
-
-                <div class="space-y-4 text-sm text-slate-700 leading-relaxed">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="p-4 bg-sky-50 rounded-xl border border-sky-100">
-                            <h4 class="font-bold text-sky-900 mb-2">🦇 Dơi</h4>
-                            <ul class="list-disc list-inside space-y-1 text-xs text-slate-700">
-                                <li>Định vị trong không khí.</li>
-                                <li>Phát sóng siêu âm bằng thanh quản.</li>
-                                <li>Thu âm phản hồi bằng tai.</li>
+                    <h4 class="font-bold text-slate-800 text-sm mt-3 mb-1">Hearing Protection Mechanism</h4>
+                    <p class="text-sm text-slate-700">Because bats emit extremely loud sounds right next to their own ears, small middle-ear muscles <strong>contract momentarily during sound emission</strong>. This temporarily dampens their hearing to prevent self-deafening.</p>
+                `,
+                check: {
+                    q: "Which structure inside the ear helps bats convert sound vibrations into nerve signals?",
+                    opts: ["Nose-leaf", "Tragus", "Cochlea"],
+                    ans: 2
+                }
+            },
+            {
+                id: 4,
+                title: "4. Types of Sounds and Hunting Process",
+                content: `
+                    <h4 class="font-bold text-slate-800 text-sm mb-2">Two Main Signal Types:</h4>
+                    <div class="space-y-2 mb-4">
+                        <div class="p-3 bg-blue-50 rounded-xl text-xs">
+                            <strong class="text-blue-700 font-bold">1. Constant Frequency (CF / Narrowband):</strong> Maintains a single frequency. Ideal for detecting target movement and wing-beat speed of insects.
+                        </div>
+                        <div class="p-3 bg-indigo-50 rounded-xl text-xs">
+                            <strong class="text-indigo-700 font-bold">2. Frequency Modulated (FM / Broadband):</strong> Changes frequency rapidly. Provides precise spatial location and detailed distance measurement.
+                        </div>
+                    </div>
+                    <h4 class="font-bold text-slate-800 text-sm mt-4 mb-2">The 3 Hunting Stages</h4>
+                    <ol class="list-decimal pl-5 text-sm text-slate-700 space-y-2">
+                        <li><strong>Search Stage:</strong> Slow, periodic sound pulses while scanning the area.</li>
+                        <li><strong>Approach Stage:</strong> Pulse rate increases rapidly upon target detection.</li>
+                        <li><strong>Terminal Buzz:</strong> Emits up to <strong>200 pulses per second</strong> just before capture for pinpoint accuracy.</li>
+                    </ol>
+                    <h4 class="font-bold text-slate-800 text-sm mt-4 mb-1">Doppler Shift Compensation (DSC)</h4>
+                    <p class="text-sm text-slate-700">Horseshoe bats adjust their emitted pitch during flight to compensate for frequency shifts caused by their own relative velocity.</p>
+                `,
+                check: {
+                    q: "What is the rapid pulse sequence (up to 200 pulses/sec) emitted right before catching prey called?",
+                    opts: ["Search Phase", "Terminal Buzz", "Doppler Shift"],
+                    ans: 1
+                }
+            },
+            {
+                id: 5,
+                title: "5. Evolution and Dietary Diversity",
+                content: `
+                    <p class="text-sm text-slate-700">Bats first evolved over <strong>50 million years ago</strong>. Over time, diverse species adapted to specialized dietary niches.</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 my-4 text-xs">
+                        <div class="p-2 border rounded-lg bg-slate-50"><strong class="block text-slate-800">Insectivorous</strong> Eats insects (moths, mosquitoes)</div>
+                        <div class="p-2 border rounded-lg bg-slate-50"><strong class="block text-slate-800">Frugivorous</strong> Eats fruit</div>
+                        <div class="p-2 border rounded-lg bg-slate-50"><strong class="block text-slate-800">Nectarivorous</strong> Drinks flower nectar</div>
+                        <div class="p-2 border rounded-lg bg-slate-50"><strong class="block text-slate-800">Carnivorous</strong> Eats small vertebrates</div>
+                        <div class="p-2 border rounded-lg bg-slate-50"><strong class="block text-slate-800">Piscivorous</strong> Catches surface fish</div>
+                        <div class="p-2 border rounded-lg bg-slate-50"><strong class="block text-slate-800">Sanguivorous</strong> Feeds on blood</div>
+                    </div>
+                    <h4 class="font-bold text-slate-800 text-sm mt-3 mb-1">Special Adaptations:</h4>
+                    <ul class="list-disc pl-5 text-xs text-slate-700 space-y-1">
+                        <li><strong>Nectar-feeders:</strong> Unusually long tongues; act as important plant pollinators.</li>
+                        <li><strong>Vampire bats (Sanguivorous):</strong> Specialized kidneys to excrete excess iron; heat-sensitive facial organs to locate blood vessels.</li>
+                        <li><strong>Fruit bats:</strong> Advanced blood sugar regulation for high-sugar diets.</li>
+                    </ul>
+                `,
+                check: {
+                    q: "Which adaptation allows vampire bats to locate blood vessels on prey?",
+                    opts: ["Heat-sensitive organs", "Long tongues", "Constant frequency calls"],
+                    ans: 0
+                }
+            },
+            {
+                id: 6,
+                title: "6. Bats and Dolphins: Convergent Evolution",
+                content: `
+                    <h4 class="font-bold text-slate-800 text-sm mb-2">What is Convergent Evolution?</h4>
+                    <p class="text-sm text-slate-700">Convergent evolution occurs when <strong>distantly related species independently develop similar physical traits or abilities</strong> to adapt to similar environmental pressures.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-4 text-xs">
+                        <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                            <h5 class="font-bold text-blue-800 text-sm mb-1">Bats (Air)</h5>
+                            <ul class="space-y-1 text-slate-700">
+                                <li>• Ultrasound generated in <strong>larynx</strong></li>
+                                <li>• Received through <strong>ears</strong></li>
+                                <li>• Hunt airborne insects</li>
                             </ul>
                         </div>
                         <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-100">
-                            <h4 class="font-bold text-indigo-900 mb-2">🐬 Cá heo</h4>
-                            <ul class="list-disc list-inside space-y-1 text-xs text-slate-700">
-                                <li>Định vị trong nước.</li>
-                                <li>Phát âm thanh bằng cấu trúc vùng mũi.</li>
-                                <li>Nhận âm phản hồi qua vùng hàm dưới.</li>
+                            <h5 class="font-bold text-indigo-800 text-sm mb-1">Dolphins (Water)</h5>
+                            <ul class="space-y-1 text-slate-700">
+                                <li>• Clicks generated in <strong>nasal region</strong></li>
+                                <li>• Received through <strong>lower jawbone</strong></li>
+                                <li>• Hunt underwater fish</li>
                             </ul>
                         </div>
                     </div>
-
-                    <p>
-                        Hai nhóm động vật này phát triển khả năng định vị bằng âm thanh một cách hoàn toàn độc lập.
-                    </p>
-
-                    <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl">
-                        <strong class="text-amber-900 block mb-1">🔗 Convergent Evolution (Tiến hóa hội tụ)</strong>
-                        <p class="text-amber-800 text-xs leading-relaxed">
-                            Hiện tượng các loài không có quan hệ họ hàng gần phát triển những đặc điểm tương tự do phải chịu áp lực môi trường sống tương đồng.
-                        </p>
-                    </div>
-
-                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
-                        <h4 class="font-bold text-slate-800 mb-1">📌 Phân biệt Microbats và Megabats:</h4>
-                        <ul class="list-disc list-inside space-y-1 text-xs text-slate-600">
-                            <li><strong>Microbats:</strong> Phần lớn sử dụng định vị bằng siêu âm, thường ăn côn trùng và động vật nhỏ.</li>
-                            <li><strong>Megabats:</strong> Phần lớn ăn quả và mật hoa, dựa vào thị giác và khứu giác. (Dơi quả Ai Cập là ngoại lệ có thể dùng tiếng tạch bằng lưỡi để định hướng).</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="mt-8 pt-4 border-t border-gray-100 flex justify-between items-center">
-                    <button onclick="markSectionComplete(6)" id="btn-complete-6" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow transition">
-                        ✓ Đánh dấu đã học phần này
-                    </button>
-                    <div class="flex gap-2">
-                        <button onclick="switchSection(5)" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-slate-700 text-xs font-semibold rounded-lg transition">← Quay lại</button>
-                        <button onclick="switchSection(7)" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg shadow transition">Đến bài kiểm tra 📝 →</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Section 7: Knowledge Review -->
-            <div id="section-7" class="content-section hidden bg-white rounded-2xl shadow-sm border border-sky-100 p-6 md:p-8">
-                <div class="border-b border-gray-100 pb-4 mb-6">
-                    <span class="inline-block px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs font-semibold mb-2">Phần 7 / 7</span>
-                    <h2 class="text-2xl font-bold text-slate-900">7. Kiểm tra kiến thức (10 câu trắc nghiệm)</h2>
-                    <p class="text-sm text-slate-500 mt-1">Hoàn thành bài kiểm tra để tổng kết mức độ hiểu biết của bạn về Lesson 1.</p>
-                </div>
-
-                <form id="quiz-form" class="space-y-6">
-                    <!-- Questions will be injected here -->
-                </form>
-
-                <div class="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <button type="button" onclick="submitQuiz()" class="w-full sm:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md transition">
-                        Nộp bài kiểm tra
-                    </button>
-                    <div id="quiz-result-summary" class="hidden text-sm font-semibold text-slate-800"></div>
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-    <!-- Footer -->
-    <footer class="bg-white border-t border-sky-100 py-6 mt-12 text-center text-xs text-slate-500">
-        <p>Interactive Learning Web App – Lesson 1: Bats – Echolocation and Evolutionary Adaptation</p>
-    </footer>
-
-    <!-- JavaScript Logic -->
-    <script>
-        // Quiz Data
-        const quizQuestions = [
-            {
-                q: "1. Echolocation là gì?",
-                options: { A: "Định vị bằng âm thanh", B: "Định vị bằng ánh sáng", C: "Định vị bằng mùi" },
-                correct: "A"
-            },
-            {
-                q: "2. Ai đưa ra thuật ngữ Echolocation?",
-                options: { A: "Charles Darwin", B: "Donald R. Griffin", C: "Lazzaro Spallanzani" },
-                correct: "B"
-            },
-            {
-                q: "3. Sóng siêu âm có tần số như thế nào?",
-                options: { A: "Dưới 20 Hz", B: "Trên 20.000 Hz", C: "Khoảng 100 Hz" },
-                correct: "B"
-            },
-            {
-                q: "4. Dơi xác định khoảng cách bằng cách nào?",
-                options: { A: "Đo thời gian âm phản hồi", B: "Quan sát màu sắc", C: "Ngửi vật thể" },
-                correct: "A"
-            },
-            {
-                q: "5. Bộ phận nào giúp dơi thu nhận âm phản hồi?",
-                options: { A: "Cánh", B: "Tai", C: "Đuôi" },
-                correct: "B"
-            },
-            {
-                q: "6. Terminal Buzz xảy ra khi nào?",
-                options: { A: "Khi ngủ", B: "Khi tìm nơi trú ẩn", C: "Ngay trước khi bắt mồi" },
-                correct: "C"
-            },
-            {
-                q: "7. Dơi ăn mật hoa có đặc điểm nào?",
-                options: { A: "Lưỡi dài", B: "Vây lớn", C: "Mắt phát sáng" },
-                correct: "A"
-            },
-            {
-                q: "8. Dơi hút máu có khả năng thích nghi nào?",
-                options: { A: "Đào thải sắt dư thừa", B: "Sống dưới nước", C: "Không cần thận" },
-                correct: "A"
-            },
-            {
-                q: "9. Dơi quả Ai Cập sử dụng gì để định hướng?",
-                options: { A: "Tiếng tạch bằng lưỡi", B: "Ánh sáng phát ra từ mắt", C: "Từ trường" },
-                correct: "A"
-            },
-            {
-                q: "10. Tiến hóa hội tụ là gì?",
-                options: { A: "Các loài cùng biến mất", B: "Các loài độc lập phát triển đặc điểm tương tự", C: "Một loài ngừng tiến hóa" },
-                correct: "B"
+                    <h4 class="font-bold text-slate-800 text-sm mt-3 mb-1">Microbats vs. Megabats</h4>
+                    <p class="text-xs text-slate-700">Microbats are mostly small insect-eaters using echolocation. Megabats (fruit bats) are larger, relying mostly on vision/smell. <em>Exception:</em> The <strong>Egyptian fruit bat</strong> uses tongue clicks for echolocation.</p>
+                `,
+                check: {
+                    q: "How do dolphins receive returning echolocation signals underwater?",
+                    opts: ["Through their ears", "Through their lower jaw", "Through their tail"],
+                    ans: 1
+                }
             }
         ];
 
-        // State management
-        let appState = {
-            completedSections: { 1: false, 2: false, 3: false, 4: false, 5: false, 6: false },
-            quizScore: null
+        // 2. Vocabulary List
+        const vocabList = [
+            { word: "Echolocation", pos: "noun", ipa: "/ˌek.əʊ.ləʊˈkeɪ.ʃən/", def: "Biological process using reflected sound waves to locate objects.", vi: "Sự định vị bằng tiếng vang", ex: "Bats use echolocation to fly safely in darkness.", col: "use echolocation, rely on echolocation" },
+            { word: "Ultrasound", pos: "noun", ipa: "/ˈʌl.trə.saʊnd/", def: "Sound waves with frequencies above the human hearing limit (20 kHz).", vi: "Sóng siêu âm", ex: "Bats produce ultrasound pulses to detect tiny insects.", col: "emit ultrasound, ultrasound frequency" },
+            { word: "Frequency", pos: "noun", ipa: "/ˈfriː.kwən.si/", def: "The number of sound vibrations occurring per second.", vi: "Tần số", ex: "High frequency sounds have shorter wavelengths.", col: "high frequency, constant frequency" },
+            { word: "Wavelength", pos: "noun", ipa: "/ˈweɪv.leŋθ/", def: "The physical distance between two crests of a wave.", vi: "Bước sóng", ex: "Short wavelengths allow bats to hit small target targets.", col: "short wavelength, sound wavelength" },
+            { word: "Adaptation", pos: "noun", ipa: "/ˌæd.æpˈteɪ.ʃən/", def: "A biological change that helps an organism survive in its environment.", vi: "Sự thích nghi tiến hóa", ex: "Specialized ears are a key physical adaptation.", col: "evolutionary adaptation, physical adaptation" },
+            { word: "Convergent Evolution", pos: "noun", ipa: "/kənˈvɜː.dʒənt ˌiː.vəˈluː.ʃən/", def: "Independent evolution of similar features in species of different lineages.", vi: "Tiến hóa đồng quy", ex: "Bats and dolphins are a textbook example of convergent evolution.", col: "demonstrate convergent evolution" },
+            { word: "Terminal Buzz", pos: "noun", ipa: "/ˈtɜː.mɪ.nəl bʌz/", def: "Rapid sound pulses emitted right before capturing prey.", vi: "Chuỗi âm thanh dồn dập trước khi bắt mồi", ex: "The bat entered the terminal buzz phase to capture the moth.", col: "produce a terminal buzz" },
+            { word: "Larynx", pos: "noun", ipa: "/ˈlær.ɪŋks/", def: "The vocal organ in the throat producing sound.", vi: "Thanh quản", ex: "Sound is generated in the bat's larynx.", col: "larynx muscles, emit via larynx" },
+            { word: "Insectivorous", pos: "adj", ipa: "/ˌɪn.sekˈtɪv.ər.əs/", def: "Feeding primarily on insects.", vi: "Ăn sâu bọ", ex: "Most microbats are insectivorous creatures.", col: "insectivorous species, insectivorous diet" },
+            { word: "Attenuate", pos: "verb", ipa: "/əˈten.ju.eɪt/", def: "To reduce in force, intensity, or energy.", vi: "Suy giảm (năng lượng sóng)", ex: "High frequency sounds attenuate rapidly in dense air.", col: "attenuate rapidly, signal attenuation" }
+        ];
+
+        // 3. Final 20 Questions Assessment
+        const finalQuizQuestions = [
+            { q: "What is echolocation?", opts: ["Navigation using light", "Navigation using reflected sound waves", "Navigation using magnetic fields", "Navigation using sense of smell"], ans: 1, exp: "Echolocation is defined as using reflected sound waves to detect objects and spatial location." },
+            { q: "Who coined the scientific term 'echolocation' in 1938?", opts: ["Lazzaro Spallanzani", "Charles Darwin", "Donald R. Griffin", "Gregor Mendel"], ans: 2, exp: "Donald R. Griffin officially introduced the term in 1938." },
+            { q: "What frequency range defines ultrasound?", opts: ["Below 20 Hz", "Between 100 Hz and 1,000 Hz", "Above 20,000 Hz (20 kHz)", "Exactly 5,000 Hz"], ans: 2, exp: "Ultrasound is sound with frequencies above the upper limit of human hearing, which is 20,000 Hz." },
+            { q: "Why do bats prefer high-frequency sound waves for hunting small insects?", opts: ["They travel farther in the air", "They have shorter wavelengths that bounce off small targets", "They don't make any noise", "They travel slower"], ans: 1, exp: "High frequencies produce shorter wavelengths, which can reflect off tiny objects like moths." },
+            { q: "How do bats determine the distance to an object?", opts: ["By observing the color of the echo", "By measuring the time delay between sending and receiving sound", "By changing their flying speed", "By smelling the prey"], ans: 1, exp: "Bats measure distance based on the exact time it takes for an echo to return." },
+            { q: "Which organ produces ultrasound in bats?", opts: ["Cochlea", "Tragus", "Larynx", "Nose-leaf"], ans: 2, exp: "The larynx (vocal organ) generates high-frequency vocal sounds." },
+            { q: "What is the function of the tragus in a bat's ear?", opts: ["To produce sound", "To help determine the vertical direction of incoming echoes", "To protect against cold air", "To control flying speed"], ans: 1, exp: "The tragus helps the bat determine the direction and angle of returning sounds." },
+            { q: "How do bats protect their hearing when emitting loud sounds?", opts: ["They cover their ears with wings", "Middle-ear muscles contract to reduce sound impact", "They close their eyes", "They stop breathing"], ans: 1, exp: "Small middle-ear muscles contract during sound production to shield their delicate ears." },
+            { q: "What characterizes Constant Frequency (CF) sound signals?", opts: ["They change pitch rapidly", "They maintain an almost unchanged frequency", "They are audible to humans", "They are silent"], ans: 1, exp: "CF signals maintain a steady frequency, useful for measuring target velocity and wing movements." },
+            { q: "When does a bat produce the 'terminal buzz'?", opts: ["While sleeping", "During the search phase", "Immediately before catching prey", "When migrating"], ans: 2, exp: "The terminal buzz is a rapid burst of pulses right before grabbing prey." },
+            { q: "What is Doppler Shift Compensation (DSC)?", opts: ["Adjusting emitted pitch to compensate for flight movement", "Changing wing shape", "Navigating using visual landmarks", "Sleeping upside down"], ans: 0, exp: "DSC allows horseshoe bats to alter emitted pitch so returning echoes match their hearing sensitivity despite Doppler shifts." },
+            { q: "What does an insectivorous bat eat?", opts: ["Fruit", "Insects", "Fish", "Nectar"], ans: 1, exp: "Insectivorous means feeding primarily on insects." },
+            { q: "Which adaptation is unique to vampire (sanguivorous) bats?", opts: ["Long tongues", "Ability to eliminate excess iron from blood", "Large tail fins", "Feathers"], ans: 1, exp: "Vampire bats filter and excrete excess iron from their blood-rich diet." },
+            { q: "What special feature helps vampire bats locate blood vessels?", opts: ["Heat-sensitive organs around the nose", "Echolocation only", "Bright vision", "Strong smell of fruit"], ans: 0, exp: "Vampire bats have heat sensors that detect body heat from warm blood vessels." },
+            { q: "What is convergent evolution?", opts: ["Species becoming extinct", "Distantly related species independently developing similar traits", "Two animals combining into one", "Species losing traits over time"], ans: 1, exp: "Convergent evolution is when unrelated organisms evolve similar characteristics due to similar environmental demands." },
+            { q: "How do dolphins emit sound for echolocation?", opts: ["Through their lower jaw", "Using specialized structures in the nasal region", "Using vocal cords in ears", "By slapping their tails"], ans: 1, exp: "Dolphins produce clicking sounds via specialized structures near their blowhole/nasal area." },
+            { q: "How do dolphins receive returning sound echoes underwater?", opts: ["Through their ears", "Through their lower jaw region", "Through their dorsal fin", "Through their eyes"], ans: 1, exp: "Sound vibrations travel through fatty channels in the dolphin's lower jawbone to the inner ear." },
+            { q: "Which group of bats primarily relies on vision and smell instead of echolocation?", opts: ["Microbats", "Megabats", "Vampire bats", "Horseshoe bats"], ans: 1, exp: "Megabats (fruit bats) generally rely on visual sight and sense of smell." },
+            { q: "What exception exists among megabats regarding echolocation?", opts: ["Egyptian fruit bats use tongue clicks to navigate", "Flying foxes use larynx ultrasound", "Vampire bats don't fly", "No exceptions exist"], ans: 0, exp: "Egyptian fruit bats are megabats that navigate dark caves using audible tongue clicks." },
+            { q: "What happened in Lazzaro Spallanzani's 1793 experiment?", opts: ["Deaf bats navigated easily", "Blind bats navigated normally, but deaf bats failed", "Bats used light to see", "Dolphins were tested"], ans: 1, exp: "Spallanzani proved that bats need hearing rather than sight to navigate in darkness." }
+        ];
+
+        // 4. Speaking Practice Prompts Data
+        const speakingPrompts = [
+            {
+                q: "What is echolocation?",
+                model: "Echolocation is a biological process where animals emit high-frequency sound waves and listen to the returning echoes. This allows them to determine the exact location, distance, and shape of objects in pitch darkness.",
+                tags: ["biological process", "sound waves", "returning echoes", "determine location"],
+                frame: "Echolocation is a process in which [animal] uses [type of waves] to detect [objects/prey]."
+            },
+            {
+                q: "How do bats use sound to locate their prey?",
+                model: "Bats produce sound pulses through their larynx or nose. When these sound waves hit an object like a moth, they bounce back as echoes. By analyzing the time delay and pitch of the echoes, the bat calculates the distance and movement of its prey.",
+                tags: ["sound pulses", "bounce back", "time delay", "calculate distance"],
+                frame: "Bats emit sounds that [action]. When the sound hits prey, it [reflection process], allowing the bat to..."
+            },
+            {
+                q: "Why do bats use high-frequency sounds?",
+                model: "Bats use high-frequency ultrasound because high frequencies have shorter wavelengths. Shorter wavelengths are essential for bouncing off small targets like insects. Low-frequency waves would simply pass over small insects without reflecting.",
+                tags: ["ultrasound", "shorter wavelengths", "bounce off", "small targets"],
+                frame: "High-frequency sounds are useful because they have [property], which enables bats to..."
+            },
+            {
+                q: "What physical adaptations help bats detect echoes?",
+                model: "Bats have several physical adaptations, including large ears and a tragus to determine sound direction. Inside the ear, the cochlea converts vibrations into nerve signals. Additionally, middle-ear muscles contract to protect their hearing from loud emissions.",
+                tags: ["tragus", "cochlea", "middle-ear muscles", "nerve signals"],
+                frame: "Key adaptations include [structure 1] for [function 1] and [structure 2] which helps..."
+            },
+            {
+                q: "How are bats and dolphins similar?",
+                model: "Both bats and dolphins independently evolved the ability to use echolocation to navigate and hunt in environments with limited visibility. While bats navigate through air using their larynx and ears, dolphins navigate underwater using nasal structures and their lower jaw.",
+                tags: ["independently evolved", "limited visibility", "air vs underwater", "jaw/ears"],
+                frame: "Both species are similar because they use echolocation to [purpose], even though bats operate in [medium] and dolphins in..."
+            },
+            {
+                q: "What is convergent evolution?",
+                model: "Convergent evolution is an evolutionary process where distantly related species independently develop similar physical traits or features because they adapt to similar environmental challenges, such as bats and dolphins developing echolocation.",
+                tags: ["distantly related", "independently develop", "similar traits", "environmental pressures"],
+                frame: "Convergent evolution occurs when [type of species] develop [similar features] due to..."
+            }
+        ];
+
+        // APP STATE & LOCALSTORAGE MANAGEMENT
+        let state = {
+            currentTab: 'dashboard',
+            currentSection: 1,
+            completedSections: [],
+            knownVocab: [],
+            currVocabIdx: 0,
+            vocabFilter: 'all',
+            practiceTab: 'mcq',
+            quizCurrentIdx: 0,
+            quizAnswers: {},
+            quizSubmitted: false,
+            quizScore: 0,
+            speakingResponses: {},
+            finalSummary: ""
         };
 
-        const navItems = [
-            { id: 'dashboard', label: '📊 Tổng quan (Dashboard)' },
-            { id: '1', label: '1. Echolocation' },
-            { id: '2', label: '2. Âm thanh & Định vị' },
-            { id: '3', label: '3. Cấu tạo cơ thể dơi' },
-            { id: '4', label: '4. Săn mồi & Âm thanh' },
-            { id: '5', label: '5. Tiến hóa & Chế độ ăn' },
-            { id: '6', label: '6. Tiến hóa hội tụ' },
-            { id: '7', label: '7. Kiểm tra kiến thức' }
-        ];
+        // Initialize App
+        window.onload = function() {
+            loadLocalStorage();
+            updateDashboardProgress();
+            renderSection(state.currentSection);
+            renderVocabCard();
+            renderVocabTable();
+            renderPracticeActivity('mcq');
+            renderQuizQuestion();
+            loadSpeakingPrompt();
+            document.getElementById('final-summary-input').value = state.finalSummary || "";
+        };
 
-        function initApp() {
-            loadFromLocalStorage();
-            renderNav();
-            renderQuiz();
-            switchSection('dashboard');
-            updateDashboard();
-        }
-
-        function loadFromLocalStorage() {
-            const saved = localStorage.getItem('bats_lesson1_state');
+        function loadLocalStorage() {
+            const saved = localStorage.getItem('bio_english_bat_lesson');
             if (saved) {
                 try {
-                    appState = JSON.parse(saved);
-                } catch (e) {
-                    console.error("Error loading state", e);
-                }
+                    const parsed = JSON.parse(saved);
+                    state = { ...state, ...parsed };
+                } catch(e) { console.error("Error loading state", e); }
             }
         }
 
-        function saveToLocalStorage() {
-            localStorage.setItem('bats_lesson1_state', JSON.stringify(appState));
+        function saveState() {
+            localStorage.setItem('bio_english_bat_lesson', JSON.stringify(state));
+            updateDashboardProgress();
         }
 
-        function renderNav() {
-            const navContainer = document.getElementById('nav-list');
-            navContainer.innerHTML = '';
-            navItems.forEach(item => {
-                const isCompleted = item.id !== 'dashboard' && item.id !== '7' && appState.completedSections[item.id];
-                const btn = document.createElement('button');
-                btn.onclick = () => switchSection(item.id);
-                btn.className = `w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition nav-btn-${item.id}`;
-                btn.innerHTML = `
-                    <span>${item.label}</span>
-                    ${isCompleted ? '<span class="text-emerald-600 text-xs">✓</span>' : ''}
-                `;
-                navContainer.appendChild(btn);
-            });
-        }
-
-        function switchSection(sectionId) {
-            document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
-            const target = document.getElementById(`section-${sectionId}`);
-            if (target) target.classList.remove('hidden');
-
-            // Update nav styles
-            navItems.forEach(item => {
-                const btn = document.querySelector(`.nav-btn-${item.id}`);
-                if (btn) {
-                    if (item.id === String(sectionId)) {
-                        btn.className = `w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between bg-sky-500 text-white shadow-sm nav-btn-${item.id}`;
-                    } else {
-                        btn.className = `w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between text-slate-600 hover:bg-slate-50 nav-btn-${item.id}`;
-                    }
-                }
-            });
-
-            if (sectionId === 'dashboard') {
-                updateDashboard();
+        function resetAllProgress() {
+            if (confirm("Are you sure you want to reset all your learning progress?")) {
+                localStorage.removeItem('bio_english_bat_lesson');
+                location.reload();
             }
+        }
+
+        // NAVIGATION LOGIC
+        function switchTab(tabId) {
+            state.currentTab = tabId;
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+            document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) activeNav.classList.add('active');
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function markSectionComplete(sectionNum) {
-            appState.completedSections[sectionNum] = true;
-            saveToLocalStorage();
-            renderNav();
-            updateDashboard();
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
 
-            const btn = document.getElementById(`btn-complete-${sectionNum}`);
-            if (btn) {
-                btn.textContent = "✓ Đã hoàn thành!";
-                btn.classList.add("bg-emerald-800");
+        // DASHBOARD PROGRESS UPDATER
+        function updateDashboardProgress() {
+            // Lesson reading
+            const readCount = state.completedSections.length;
+            document.getElementById('prog-lesson-text').innerText = `${readCount}/6 Sections`;
+            document.getElementById('prog-lesson-bar').style.width = `${(readCount / 6) * 100}%`;
+
+            // Vocab progress
+            const vocabCount = state.knownVocab.length;
+            document.getElementById('prog-vocab-text').innerText = `${vocabCount}/10 Words`;
+            document.getElementById('prog-vocab-bar').style.width = `${(vocabCount / 10) * 100}%`;
+
+            // Practice progress
+            const practiceDone = Object.keys(state.quizAnswers).length > 0 ? 1 : 0;
+            document.getElementById('prog-practice-text').innerText = `${practiceDone} Modules Completed`;
+            document.getElementById('prog-practice-bar').style.width = `${practiceDone * 100}%`;
+
+            // Quiz score
+            if (state.quizSubmitted) {
+                document.getElementById('prog-quiz-text').innerText = `${state.quizScore}%`;
+                document.getElementById('prog-quiz-bar').style.width = `${state.quizScore}%`;
             }
         }
 
-        function updateDashboard() {
-            const completedCount = Object.values(appState.completedSections).filter(Boolean).length;
-            const pct = Math.round((completedCount / 6) * 100);
-
-            document.getElementById('dash-completed-count').textContent = `${completedCount} / 6`;
-            document.getElementById('dash-progress-pct').textContent = `${pct}%`;
-            document.getElementById('header-progress-bar').style.width = `${pct}%`;
-            document.getElementById('header-progress-text').textContent = `${pct}%`;
-
-            if (appState.quizScore !== null) {
-                document.getElementById('dash-quiz-score').textContent = `${appState.quizScore} / 10`;
-            } else {
-                document.getElementById('dash-quiz-score').textContent = `Chưa thi`;
-            }
-        }
-
-        function resetProgress() {
-            if (confirm("Bạn có chắc chắn muốn đặt lại toàn bộ tiến độ học tập?")) {
-                appState = { completedSections: { 1: false, 2: false, 3: false, 4: false, 5: false, 6: false }, quizScore: null };
-                saveToLocalStorage();
-                renderNav();
-                updateDashboard();
-                switchSection('dashboard');
-            }
-        }
-
-        function toggleReveal(id) {
-            const el = document.getElementById(id);
-            if (el) el.classList.toggle('hidden');
-        }
-
-        function renderQuiz() {
-            const form = document.getElementById('quiz-form');
-            form.innerHTML = '';
-            quizQuestions.forEach((item, index) => {
-                const div = document.createElement('div');
-                div.className = 'p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3';
-                div.innerHTML = `
-                    <p class="font-bold text-sm text-slate-900">${item.q}</p>
-                    <div class="space-y-2">
-                        ${Object.entries(item.options).map(([key, val]) => `
-                            <label class="flex items-center gap-2.5 p-2.5 rounded-lg bg-white border border-slate-200 hover:bg-sky-50 cursor-pointer text-xs transition">
-                                <input type="radio" name="q${index}" value="${key}" class="text-indigo-600 focus:ring-indigo-500">
-                                <span class="font-semibold text-slate-700">${key}.</span> 
-                                <span class="text-slate-800">${val}</span>
-                            </label>
-                        `).join('')}
-                    </div>
-                    <div id="explanation-${index}" class="hidden text-xs font-semibold p-2.5 rounded-lg mt-2"></div>
-                `;
-                form.appendChild(div);
+        // LESSON SECTIONS LOGIC
+        function showSection(num) {
+            state.currentSection = num;
+            renderSection(num);
+            document.querySelectorAll('.lesson-sec-btn').forEach((btn, idx) => {
+                if (idx + 1 === num) {
+                    btn.className = "lesson-sec-btn px-4 py-2 rounded-lg text-sm font-semibold bg-blue-500 text-white shadow-sm";
+                } else {
+                    btn.className = "lesson-sec-btn px-4 py-2 rounded-lg text-sm font-semibold bg-white text-slate-600 hover:bg-slate-100 border border-slate-200";
+                }
             });
+        }
+
+        function renderSection(num) {
+            const sec = lessonSections.find(s => s.id === num);
+            if (!sec) return;
+
+            // Main Text
+            document.getElementById('lesson-text-content').innerHTML = `
+                <h3 class="text-2xl font-bold text-slate-800 mb-3">${sec.title}</h3>
+                ${sec.content}
+            `;
+
+            // Mark button style
+            const markBtn = document.getElementById('mark-section-btn');
+            if (state.completedSections.includes(num)) {
+                markBtn.className = "px-5 py-2.5 bg-green-100 text-green-700 font-semibold rounded-xl transition flex items-center gap-2 border border-green-300";
+                markBtn.innerHTML = `<i class="fa-solid fa-circle-check text-green-600"></i> <span>Completed</span>`;
+            } else {
+                markBtn.className = "px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl shadow transition flex items-center gap-2";
+                markBtn.innerHTML = `<i class="fa-solid fa-check"></i> <span>Mark Section Complete</span>`;
+            }
+
+            // Quick check quiz
+            const chk = sec.check;
+            let optsHtml = chk.opts.map((opt, i) => `
+                <button onclick="checkQuickAnswer(${num}, ${i})" class="w-full text-left p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 hover:bg-blue-50 hover:border-blue-300 transition">
+                    ${String.fromCharCode(65 + i)}. ${opt}
+                </button>
+            `).join('');
+
+            document.getElementById('section-check-container').innerHTML = `
+                <p class="text-sm font-semibold text-slate-800 mb-2">${chk.q}</p>
+                <div class="space-y-2">${optsHtml}</div>
+                <div id="quick-feedback-${num}" class="hidden text-xs font-bold pt-2"></div>
+            `;
+        }
+
+        function checkQuickAnswer(secId, optIdx) {
+            const sec = lessonSections.find(s => s.id === secId);
+            const feedbackEl = document.getElementById(`quick-feedback-${secId}`);
+            feedbackEl.classList.remove('hidden');
+            if (optIdx === sec.check.ans) {
+                feedbackEl.className = "text-xs font-bold pt-2 text-green-600";
+                feedbackEl.innerText = "✓ Correct! Well done.";
+            } else {
+                feedbackEl.className = "text-xs font-bold pt-2 text-red-500";
+                feedbackEl.innerText = "✗ Incorrect. Try again or re-read the section.";
+            }
+        }
+
+        function toggleSectionComplete() {
+            const num = state.currentSection;
+            if (!state.completedSections.includes(num)) {
+                state.completedSections.push(num);
+            } else {
+                state.completedSections = state.completedSections.filter(x => x !== num);
+            }
+            saveState();
+            renderSection(num);
+        }
+
+        function navSection(delta) {
+            let next = state.currentSection + delta;
+            if (next >= 1 && next <= 6) {
+                showSection(next);
+            }
+        }
+
+        // VOCABULARY FLASHCARD & LIST LOGIC
+        function getFilteredVocab() {
+            if (state.vocabFilter === 'need') {
+                return vocabList.filter(v => !state.knownVocab.includes(v.word));
+            }
+            return vocabList;
+        }
+
+        function filterVocab(mode) {
+            state.vocabFilter = mode;
+            state.currVocabIdx = 0;
+            document.getElementById('vocab-filter-all').className = mode === 'all' ? "px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-500 text-white" : "px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200";
+            document.getElementById('vocab-filter-learning').className = mode === 'need' ? "px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-500 text-white" : "px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200";
+            renderVocabCard();
+        }
+
+        function renderVocabCard() {
+            const list = getFilteredVocab();
+            const cardEl = document.getElementById('flashcard-element');
+            cardEl.classList.remove('flipped');
+
+            if (list.length === 0) {
+                document.getElementById('fc-word').innerText = "All Mastered!";
+                document.getElementById('fc-ipa').innerText = "Good job!";
+                document.getElementById('fc-pos').innerText = "Done";
+                document.getElementById('fc-def').innerText = "You have marked all vocabulary words as known!";
+                document.getElementById('fc-vi').innerText = "Hoàn thành!";
+                document.getElementById('fc-example').innerText = "Select 'All' to review again.";
+                document.getElementById('fc-counter').innerText = "0 / 0";
+                return;
+            }
+
+            if (state.currVocabIdx >= list.length) state.currVocabIdx = 0;
+            const item = list[state.currVocabIdx];
+
+            document.getElementById('fc-counter').innerText = `${state.currVocabIdx + 1} / ${list.length}`;
+            document.getElementById('fc-word').innerText = item.word;
+            document.getElementById('fc-ipa').innerText = item.ipa;
+            document.getElementById('fc-pos').innerText = item.pos;
+            document.getElementById('fc-def').innerText = item.def;
+            document.getElementById('fc-vi').innerText = item.vi;
+            document.getElementById('fc-example').innerText = `"${item.ex}"`;
+        }
+
+        function flipCard() {
+            document.getElementById('flashcard-element').classList.toggle('flipped');
+        }
+
+        function nextCard() {
+            const list = getFilteredVocab();
+            if (list.length === 0) return;
+            state.currVocabIdx = (state.currVocabIdx + 1) % list.length;
+            renderVocabCard();
+        }
+
+        function prevCard() {
+            const list = getFilteredVocab();
+            if (list.length === 0) return;
+            state.currVocabIdx = (state.currVocabIdx - 1 + list.length) % list.length;
+            renderVocabCard();
+        }
+
+        function markCardStatus(isKnown) {
+            const list = getFilteredVocab();
+            if (list.length === 0) return;
+            const item = list[state.currVocabIdx];
+
+            if (isKnown && !state.knownVocab.includes(item.word)) {
+                state.knownVocab.push(item.word);
+            } else if (!isKnown && state.knownVocab.includes(item.word)) {
+                state.knownVocab = state.knownVocab.filter(w => w !== item.word);
+            }
+            saveState();
+            nextCard();
+        }
+
+        function renderVocabTable() {
+            const tbody = document.getElementById('vocab-table-body');
+            tbody.innerHTML = vocabList.map(v => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-3 font-bold text-slate-800">${v.word}</td>
+                    <td class="p-3"><span class="font-mono text-slate-500 text-xs">${v.ipa}</span> <span class="text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">${v.pos}</span></td>
+                    <td class="p-3 text-slate-700">${v.def}</td>
+                    <td class="p-3 font-semibold text-blue-600">${v.vi}</td>
+                    <td class="p-3 text-xs italic text-slate-500">${v.col || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        // COMPREHENSION EXERCISES LOGIC
+        function switchPractice(type) {
+            state.practiceTab = type;
+            document.querySelectorAll('.practice-tab').forEach(btn => {
+                btn.className = "practice-tab px-4 py-2 rounded-xl text-sm font-semibold bg-white text-slate-600 border border-slate-200 hover:bg-slate-100";
+            });
+            document.getElementById(`p-tab-${type}`).className = "practice-tab px-4 py-2 rounded-xl text-sm font-semibold bg-blue-500 text-white shadow-sm";
+            renderPracticeActivity(type);
+        }
+
+        function renderPracticeActivity(type) {
+            const container = document.getElementById('practice-container');
+            if (type === 'mcq') {
+                container.innerHTML = `
+                    <h3 class="text-lg font-bold text-slate-800 mb-4">A. Multiple Choice Comprehension</h3>
+                    <div class="space-y-6">
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <p class="font-semibold text-sm text-slate-800 mb-3">1. Why can deaf bats not survive effectively in the wild?</p>
+                            <div class="space-y-2">
+                                <button onclick="checkPracticeMCQ(this, false, 'Echolocation requires hearing returning echoes.')" class="w-full text-left p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-medium hover:bg-blue-50">A. They cannot fly without hearing.</button>
+                                <button onclick="checkPracticeMCQ(this, true, 'Spallanzani demonstrated that deaf bats cannot navigate or locate prey because they depend on returning sound echoes.')" class="w-full text-left p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-medium hover:bg-blue-50">B. They cannot receive reflected echoes to navigate and hunt.</button>
+                                <button onclick="checkPracticeMCQ(this, false, 'Bats can see in light, but deaf bats specifically lack echolocation.')" class="w-full text-left p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-medium hover:bg-blue-50">C. They lose their sense of smell.</button>
+                            </div>
+                            <div class="mcq-feedback hidden mt-2 text-xs font-bold p-2 rounded"></div>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <p class="font-semibold text-sm text-slate-800 mb-3">2. What happens to high-frequency ultrasound waves in the air?</p>
+                            <div class="space-y-2">
+                                <button onclick="checkPracticeMCQ(this, false, 'High-frequency sound actually attenuates faster than low frequency.')" class="w-full text-left p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-medium hover:bg-blue-50">A. They travel infinitely without losing energy.</button>
+                                <button onclick="checkPracticeMCQ(this, true, 'High frequencies attenuate (lose energy) rapidly in air, limiting operational distance.')" class="w-full text-left p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-medium hover:bg-blue-50">B. They attenuate rapidly, which reduces the detection range.</button>
+                                <button onclick="checkPracticeMCQ(this, false, 'Frequency stays constant unless Doppler shifted.')" class="w-full text-left p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-medium hover:bg-blue-50">C. They turn into visible light waves.</button>
+                            </div>
+                            <div class="mcq-feedback hidden mt-2 text-xs font-bold p-2 rounded"></div>
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'tf') {
+                container.innerHTML = `
+                    <h3 class="text-lg font-bold text-slate-800 mb-4">B. True or False Statements</h3>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+                            <p class="text-xs sm:text-sm text-slate-700">1. All bat species rely exclusively on echolocation and are completely blind.</p>
+                            <div class="flex gap-2">
+                                <button onclick="checkTF(this, false, 'False. Megabats mostly rely on vision and smell!')" class="px-3 py-1.5 bg-white border rounded-lg text-xs font-bold hover:bg-slate-100">True</button>
+                                <button onclick="checkTF(this, true, 'Correct! Megabats rely heavily on sight and smell.')" class="px-3 py-1.5 bg-white border rounded-lg text-xs font-bold hover:bg-slate-100">False</button>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+                            <p class="text-xs sm:text-sm text-slate-700">2. Dolphins receive echolocation signals through specialized fat channels in their lower jaw.</p>
+                            <div class="flex gap-2">
+                                <button onclick="checkTF(this, true, 'Correct! Sound travels through their lower jaw bone to the inner ear.')" class="px-3 py-1.5 bg-white border rounded-lg text-xs font-bold hover:bg-slate-100">True</button>
+                                <button onclick="checkTF(this, false, 'False. Dolphins indeed receive sound through their jaw.')" class="px-3 py-1.5 bg-white border rounded-lg text-xs font-bold hover:bg-slate-100">False</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'match') {
+                container.innerHTML = `
+                    <h3 class="text-lg font-bold text-slate-800 mb-4">C. Term Matching</h3>
+                    <p class="text-xs text-slate-500 mb-4">Select a term on the left, then click its corresponding definition on the right.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="space-y-2" id="match-terms">
+                            <button onclick="selectMatchTerm(this, 'larynx')" class="w-full text-left p-3 border rounded-xl bg-slate-50 font-bold text-xs text-blue-600">Larynx</button>
+                            <button onclick="selectMatchTerm(this, 'cochlea')" class="w-full text-left p-3 border rounded-xl bg-slate-50 font-bold text-xs text-blue-600">Cochlea</button>
+                            <button onclick="selectMatchTerm(this, 'dsc')" class="w-full text-left p-3 border rounded-xl bg-slate-50 font-bold text-xs text-blue-600">Doppler Shift Compensation</button>
+                        </div>
+                        <div class="space-y-2" id="match-defs">
+                            <button onclick="selectMatchDef(this, 'dsc')" class="w-full text-left p-3 border rounded-xl bg-white text-xs text-slate-700 hover:bg-blue-50">Frequency pitch adjustment during flight</button>
+                            <button onclick="selectMatchDef(this, 'larynx')" class="w-full text-left p-3 border rounded-xl bg-white text-xs text-slate-700 hover:bg-blue-50">Organ that generates ultrasound pulses</button>
+                            <button onclick="selectMatchDef(this, 'cochlea')" class="w-full text-left p-3 border rounded-xl bg-white text-xs text-slate-700 hover:bg-blue-50">Inner ear organ converting vibrations into nerve signals</button>
+                        </div>
+                    </div>
+                    <div id="match-feedback" class="mt-4 text-xs font-bold text-center"></div>
+                `;
+            } else if (type === 'fill') {
+                container.innerHTML = `
+                    <h3 class="text-lg font-bold text-slate-800 mb-4">D. Fill in the Blanks</h3>
+                    <div class="space-y-4 text-sm text-slate-700">
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                            <p>1. Sound with a frequency above 20,000 Hz is called <input type="text" id="fill-1" class="px-2 py-1 border rounded text-blue-600 font-bold text-xs w-32 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="term...">.</p>
+                            <p>2. Right before capturing prey, bats emit rapid sound pulses known as the terminal <input type="text" id="fill-2" class="px-2 py-1 border rounded text-blue-600 font-bold text-xs w-28 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="word...">.</p>
+                            <button onclick="checkFillBlanks()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold mt-2">Check Answers</button>
+                            <p id="fill-feedback" class="text-xs font-bold mt-1"></p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Exercise Helper Handlers
+        function checkPracticeMCQ(btn, isCorrect, exp) {
+            const parent = btn.closest('.p-4');
+            const fb = parent.querySelector('.mcq-feedback');
+            fb.classList.remove('hidden');
+            if (isCorrect) {
+                fb.className = "mcq-feedback text-xs font-bold p-2 rounded bg-green-100 text-green-700 mt-2";
+                fb.innerText = "✓ Correct! " + exp;
+            } else {
+                fb.className = "mcq-feedback text-xs font-bold p-2 rounded bg-red-100 text-red-700 mt-2";
+                fb.innerText = "✗ Incorrect. " + exp;
+            }
+        }
+
+        function checkTF(btn, isCorrect, exp) {
+            alert(exp);
+        }
+
+        let selectedTerm = null;
+        function selectMatchTerm(btn, termId) {
+            document.querySelectorAll('#match-terms button').forEach(b => b.classList.remove('ring-2', 'ring-blue-500'));
+            btn.classList.add('ring-2', 'ring-blue-500');
+            selectedTerm = termId;
+        }
+
+        function selectMatchDef(btn, defId) {
+            const fb = document.getElementById('match-feedback');
+            if (!selectedTerm) {
+                fb.className = "mt-4 text-xs font-bold text-center text-amber-600";
+                fb.innerText = "Please select a term on the left first!";
+                return;
+            }
+            if (selectedTerm === defId) {
+                btn.className = "w-full text-left p-3 border rounded-xl bg-green-100 text-green-800 font-bold text-xs";
+                fb.className = "mt-4 text-xs font-bold text-center text-green-600";
+                fb.innerText = "✓ Correct Match!";
+            } else {
+                fb.className = "mt-4 text-xs font-bold text-center text-red-500";
+                fb.innerText = "✗ Incorrect Match. Try again.";
+            }
+            selectedTerm = null;
+        }
+
+        function checkFillBlanks() {
+            const ans1 = document.getElementById('fill-1').value.trim().toLowerCase();
+            const ans2 = document.getElementById('fill-2').value.trim().toLowerCase();
+            const fb = document.getElementById('fill-feedback');
+
+            let correct = 0;
+            if (ans1 === 'ultrasound') correct++;
+            if (ans2 === 'buzz') correct++;
+
+            if (correct === 2) {
+                fb.className = "text-xs font-bold mt-1 text-green-600";
+                fb.innerText = "✓ Excellent! All blanks filled correctly.";
+            } else {
+                fb.className = "text-xs font-bold mt-1 text-red-500";
+                fb.innerText = `You got ${correct}/2 correct. Hint: 1. ultrasound, 2. buzz`;
+            }
+        }
+
+        // FINAL QUIZ LOGIC
+        function renderQuizQuestion() {
+            const q = finalQuizQuestions[state.quizCurrentIdx];
+            document.getElementById('quiz-progress-badge').innerText = `Question ${state.quizCurrentIdx + 1} / 20`;
+            document.getElementById('quiz-question-box').innerText = `${state.quizCurrentIdx + 1}. ${q.q}`;
+
+            const userAns = state.quizAnswers[state.quizCurrentIdx];
+            const optsBox = document.getElementById('quiz-options-box');
+
+            optsBox.innerHTML = q.opts.map((opt, i) => {
+                const isSelected = userAns === i;
+                const btnStyle = isSelected ? 
+                    "bg-blue-500 text-white border-blue-500" : 
+                    "bg-white text-slate-700 border-slate-200 hover:bg-slate-50";
+                return `
+                    <button onclick="selectQuizAnswer(${i})" class="w-full text-left p-3.5 border rounded-xl text-sm font-medium transition flex items-center justify-between ${btnStyle}">
+                        <span>${String.fromCharCode(65 + i)}. ${opt}</span>
+                        ${isSelected ? '<i class="fa-solid fa-circle-check"></i>' : ''}
+                    </button>
+                `;
+            }).join('');
+
+            // Controls visibility
+            document.getElementById('quiz-prev-btn').style.visibility = state.quizCurrentIdx === 0 ? 'hidden' : 'visible';
+            if (state.quizCurrentIdx === 19) {
+                document.getElementById('quiz-next-btn').classList.add('hidden');
+                document.getElementById('quiz-submit-btn').classList.remove('hidden');
+            } else {
+                document.getElementById('quiz-next-btn').classList.remove('hidden');
+                document.getElementById('quiz-submit-btn').classList.add('hidden');
+            }
+        }
+
+        function selectQuizAnswer(optIdx) {
+            if (state.quizSubmitted) return;
+            state.quizAnswers[state.quizCurrentIdx] = optIdx;
+            renderQuizQuestion();
+        }
+
+        function navQuiz(delta) {
+            const next = state.quizCurrentIdx + delta;
+            if (next >= 0 && next < 20) {
+                state.quizCurrentIdx = next;
+                renderQuizQuestion();
+            }
         }
 
         function submitQuiz() {
-            let score = 0;
-            quizQuestions.forEach((item, index) => {
-                const selected = document.querySelector(`input[name="q${index}"]:checked`);
-                const expDiv = document.getElementById(`explanation-${index}`);
-                expDiv.classList.remove('hidden');
-
-                if (selected && selected.value === item.correct) {
-                    score++;
-                    expDiv.className = "text-xs font-semibold p-2.5 rounded-lg mt-2 bg-emerald-50 text-emerald-800 border border-emerald-200";
-                    expDiv.textContent = `✓ Chính xác! Đáp án đúng là ${item.correct}.`;
-                } else {
-                    expDiv.className = "text-xs font-semibold p-2.5 rounded-lg mt-2 bg-rose-50 text-rose-800 border border-rose-200";
-                    expDiv.textContent = `✗ Chưa chính xác. Đáp án đúng là ${item.correct}.`;
+            let scoreCount = 0;
+            finalQuizQuestions.forEach((q, idx) => {
+                if (state.quizAnswers[idx] === q.ans) {
+                    scoreCount++;
                 }
             });
 
-            appState.quizScore = score;
-            saveToLocalStorage();
-            updateDashboard();
+            state.quizScore = Math.round((scoreCount / 20) * 100);
+            state.quizSubmitted = true;
+            saveState();
 
-            const summary = document.getElementById('quiz-result-summary');
-            summary.classList.remove('hidden');
-            summary.innerHTML = `Kết quả của bạn: <span class="text-indigo-600 font-bold text-base">${score} / 10</span> câu đúng (${Math.round(score*10)}%).`;
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            document.getElementById('quiz-active-area').classList.add('hidden');
+            document.getElementById('quiz-result-area').classList.remove('hidden');
+            document.getElementById('quiz-score-percent').innerText = `${state.quizScore}%`;
+            document.getElementById('quiz-score-details').innerText = `You scored ${scoreCount} out of 20 correctly.`;
+
+            // Prepare Review List
+            const reviewList = document.getElementById('quiz-review-list');
+            reviewList.innerHTML = finalQuizQuestions.map((q, idx) => {
+                const uAns = state.quizAnswers[idx];
+                const isCorrect = uAns === q.ans;
+                return `
+                    <div class="p-3.5 rounded-xl text-xs border ${isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}">
+                        <p class="font-bold text-slate-800 mb-1">${idx + 1}. ${q.q}</p>
+                        <p class="text-slate-600">Your answer: <span class="${isCorrect ? 'text-green-700 font-bold' : 'text-red-600 font-bold'}">${uAns !== undefined ? q.opts[uAns] : 'Not Answered'}</span></p>
+                        ${!isCorrect ? `<p class="text-slate-600">Correct answer: <span class="font-bold text-green-700">${q.opts[q.ans]}</span></p>` : ''}
+                        <p class="text-slate-500 italic mt-1 border-t border-slate-200/50 pt-1">Explanation: ${q.exp}</p>
+                    </div>
+                `;
+            }).join('');
         }
 
-        window.onload = initApp;
+        function resetQuiz() {
+            state.quizCurrentIdx = 0;
+            state.quizAnswers = {};
+            state.quizSubmitted = false;
+            document.getElementById('quiz-active-area').classList.remove('hidden');
+            document.getElementById('quiz-result-area').classList.add('hidden');
+            renderQuizQuestion();
+        }
+
+        function toggleQuizReview() {
+            document.getElementById('quiz-review-container').classList.toggle('hidden');
+        }
+
+        // ENGLISH SPEAKING PRACTICE LOGIC
+        function loadSpeakingPrompt() {
+            const idx = parseInt(document.getElementById('speaking-select').value);
+            const data = speakingPrompts[idx];
+
+            document.getElementById('spk-model-ans').innerText = `"${data.model}"`;
+            document.getElementById('spk-vocab-tags').innerHTML = data.tags.map(t => 
+                `<span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[11px] font-medium">${t}</span>`
+            ).join('');
+            document.getElementById('spk-frame').innerText = data.frame;
+
+            // Load saved user answer if exists
+            document.getElementById('spk-user-input').value = state.speakingResponses[idx] || "";
+        }
+
+        function saveSpeakingResponse() {
+            const idx = parseInt(document.getElementById('speaking-select').value);
+            const val = document.getElementById('spk-user-input').value;
+            state.speakingResponses[idx] = val;
+            saveState();
+            alert("Your speaking response draft has been saved!");
+        }
+
+        // FINAL REVIEW SUMMARY LOGIC
+        function saveFinalSummary() {
+            const val = document.getElementById('final-summary-input').value;
+            state.finalSummary = val;
+            saveState();
+            const status = document.getElementById('summary-saved-status');
+            status.innerText = "✓ Summary saved successfully!";
+            setTimeout(() => { status.innerText = ""; }, 3000);
+        }
     </script>
 </body>
 </html>
