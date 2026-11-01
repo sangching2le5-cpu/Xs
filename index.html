@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 1: Bats – Echolocation and Evolutionary Adaptation</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        pastel: {
+                            blue: '#e0f2fe',
+                            sky: '#f0f9ff',
+                            mint: '#ecfdf5',
+                            card: '#ffffff',
+                            dark: '#0f172a',
+                            accent: '#0284c7',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .transition-all { transition: all 0.3s ease; }
+    </style>
+</head>
+<body class="bg-pastel-sky text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-sky-100 shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-sky-500 text-white flex items-center justify-center font-bold text-xl shadow-md">
+                    🦇
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900">Lesson 1: Bats – Echolocation & Evolution</h1>
+                    <p class="text-xs text-slate-500">Định vị bằng âm thanh và thích nghi tiến hóa ở loài dơi</p>
+                </div>
+            </div>
+            <!-- Quick Progress bar & Reset -->
+            <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+                <div class="flex items-center gap-2 bg-sky-50 px-3 py-1.5 rounded-full border border-sky-100">
+                    <span class="text-xs font-semibold text-sky-700">Tiến độ:</span>
+                    <div class="w-24 bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                        <div id="header-progress-bar" class="bg-sky-500 h-2.5 rounded-full transition-all" style="width: 0%"></div>
+                    </div>
+                    <span id="header-progress-text" class="text-xs font-bold text-sky-800">0%</span>
+                </div>
+                <button onclick="resetProgress()" class="text-xs text-rose-600 hover:text-rose-800 font-medium px-2.5 py-1.5 rounded border border-rose-200 bg-rose-50 hover:bg-rose-100 transition">
+                    Đặt lại
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto w-full px-4 py-6 flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="lg:col-span-1">
+            <div class="bg-white rounded-2xl shadow-sm border border-sky-100 p-4 sticky top-24">
+                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 px-2">Mục lục bài học</h2>
+                <nav id="nav-list" class="space-y-1.5">
+                    <!-- Nav items generated via JS -->
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="lg:col-span-3 space-y-6">
+            
+            <!-- Dashboard View -->
+            <div id="section-dashboard" class="content-section bg-white rounded-2xl shadow-sm border border-sky-100 p-6 md:p-8">
+                <div class="border-b border-gray-100 pb-4 mb-6">
+                    <span class="inline-block px-3 py-1 bg-sky-100 text-sky-800 rounded-full text-xs font-semibold mb-2">Tổng quan</span>
+                    <h2 class="text-2xl font-bold text-slate-900">Dashboard Tiến độ Học tập</h2>
+                    <p class="text-sm text-slate-600 mt-1">Theo dõi hành trình chinh phục kiến thức sinh học về loài dơi.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                    <div class="bg-sky-50 border border-sky-100 rounded-xl p-5 text-center">
+                        <div class="text-3xl font-extrabold text-sky-600 mb-1" id="dash-completed-count">0 / 6</div>
+                        <div class="text-xs font-medium text-slate-600">Phần bài học hoàn thành</div>
+                    </div>
+                    <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-5 text-center">
+                        <div class="text-3xl font-extrabold text-emerald-600 mb-1" id="dash-progress-pct">0%</div>
+                        <div class="text-xs font-medium text-slate-600">Tỷ lệ hoàn thành tổng thể</div>
+                    </div>
+                    <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-5 text-center">
+                        <div class="text-3xl font-extrabold text-indigo-600 mb-1" id="dash-quiz-score">Chưa thi</div>
+                        <div class="text-xs font-medium text-slate-600">Điểm kiểm tra cuối bài</div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-6">
+                    <h3 class="font-bold text-slate-800 mb-2">Chào mừng bạn đến với Lesson 1!</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                        Web app này được thiết kế theo phương pháp tương tác tích cực (Active Learning). Hãy khám phá lần lượt các phần từ 1 đến 6, đọc kỹ kiến thức, làm các bài tập kiểm tra nhỏ trong từng phần, và hoàn thành 10 câu hỏi trắc nghiệm ở phần 7.
+                    </p>
+                    <button onclick="switchSection(1)" class="px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold rounded-xl shadow transition">
+                        Bắt đầu học ngay 🚀
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section 1 -->
+            <div id="section-1" class="content-section hidden bg-white rounded-2xl shadow-sm border border-sky-100 p-6 md:p-8">
+                <div class="border-b border-gray-100 pb-4 mb-6">
+                    <span class="inline-block px-3 py-1 bg-sky-100 text-sky-800 rounded-full text-xs font-semibold mb-2">Phần 1 / 7</span>
+                    <h2 class="text-2xl font-bold text-slate-900">1. Định vị bằng âm thanh (Echolocation)</h2>
+                    <p class="text-sm text-slate-500 mt-1">Mục tiêu: Hiểu cơ chế cơ bản và lịch sử phát hiện định vị bằng âm thanh ở dơi.</p>
+                </div>
+
+                <div class="space-y-4 text-sm text-slate-700 leading-relaxed">
+                    <p>
+                        Dơi là loài động vật có vú có khả năng bay thực sự. Nhiều loài dơi hoạt động vào ban đêm và sử dụng một khả năng đặc biệt gọi là <strong>Echolocation</strong> (định vị bằng âm thanh).
+                    </p>
+                    
+                    <div class="bg-sky-50 border-l-4 border-sky-500 p-4 rounded-r-xl my-4">
+                        <h4 class="font-bold text-sky-900 mb-2">Quá trình Echolocation gồm ba bước:</h4>
+                        <ol class="list-decimal list-inside space-y-1 text-slate-700">
+                            <li><strong>Phát:</strong> Dơi phát ra âm thanh tần số cao.</li>
+                            <li><strong>Phản xạ:</strong> Âm thanh va vào vật thể và phản xạ trở lại.</li>
+                            <li><strong>Tiếp nhận & Xử lý:</strong> Dơi nhận âm phản hồi và sử dụng thông tin đó để xác định vị trí vật thể.</li>
+                        </ol>
+                    </div>
+
+                    <p>
+                        <em>Ví dụ thực tế:</em> Khi một con bướm bay gần đó, dơi phát âm thanh. Âm thanh phản xạ từ con bướm trở lại tai dơi, giúp nó xác định vị trí chính xác và bắt mồi.
+                    </p>
+
+                    <!-- Interactive Click to Reveal: History -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 mt-6">
+                        <h4 class="font-bold text-slate-800 mb-2">📜 Lịch sử khám phá Echolocation</h4>
+                        <p class="text-xs text-slate-500 mb-3">Nhấn vào các mốc thời gian để xem chi tiết:</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <button onclick="toggleReveal('hist-1')" class="text-left p-3 rounded-lg bg-white border border-slate-200 hover:border-sky-300 shadow-sm transition">
+                                <span class="font-bold text-sky-600">Năm 1793:</span> Lazzaro Spallanzani <span class="text-xs text-slate-400 block">Bấm để xem thí nghiệm</span>
+                            </button>
+                            <button onclick="toggleReveal('hist-2')" class="text-left p-3 rounded-lg bg-white border border-slate-200 hover:border-sky-300 shadow-sm transition">
+                                <span class="font-bold text-sky-600">Năm 1938:</span> Donald R. Griffin <span class="text-xs text-slate-400 block">Bấm để xem thuật ngữ</span>
+                            </button>
+                        </div>
+                        <div id="hist-1" class="hidden mt-3 p-3 bg-sky-50 rounded-lg text-xs text-slate-700 border border-sky-100">
+                            <strong>Lazzaro Spallanzani (1793):</strong> Chứng minh rằng dơi bị bịt mắt vẫn có thể định hướng bay lượn bình thường, nhưng dơi bị làm điếc lại gặp khó khăn nghiêm trọng.
+                        </div>
+                        <div id="hist-2" class="hidden mt-3 p-3 bg-sky-50 rounded-lg text-xs text-slate-700 border border-sky-100">
+                            <strong>Donald R. Griffin (1938):</strong> Chính thức đưa ra thuật ngữ khoa học <strong>Echolocation</strong> để mô tả hiện tượng này.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Footer Navigation & Complete -->
+                <div class="mt-8 pt-4 border-t border-gray-100 flex justify-between items-center">
+                    <button onclick="markSectionComplete(1)" id="btn-complete-1" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow transition">
+                        ✓ Đánh dấu đã học phần này
+                    </button>
+                    <button onclick="switchSection(2)" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-lg shadow transition">
+                        Tiếp theo: Âm thanh & Định vị →
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section 2 -->
+            <div id="section-2" class="content-section hidden bg-white rounded-2xl shadow-sm border border-sky-100 p-6 md:p-8">
+                <div class="border-b border-gray-100 pb-4 mb-6">
+                    <span class="inline-block px-3 py-1 bg-sky-100 text-sky-800 rounded-full text-xs font-semibold mb-2">Phần 2 / 7</span>
+                    <h2 class="text-2xl font-bold text-slate-900">2. Âm thanh và khả năng định vị</h2>
+                    <p class="text-sm text-slate-500 mt-1">Mục tiêu: Hiểu tần số, bước sóng và lý do dơi sử dụng sóng siêu âm.</p>
+                </div>
+
+                <div class="space-y-4 text-sm text-slate-700 leading-relaxed">
+                    <p>Âm thanh có những đặc điểm quan trọng như tần số và bước sóng:</p>
+                    <ul class="list-disc list-inside space-y-1 pl-2">
+                        <li><strong>Tần số (Frequency):</strong> Số lần dao động của sóng âm trong một giây (đơn vị Hz).</li>
+                        <li><strong>Bước sóng (Wavelength):</strong> Khoảng cách giữa hai điểm tương ứng liên tiếp của sóng.</li>
+                        <li><strong>Sóng siêu âm (Ultrasound):</strong> Âm thanh có tần số trên <strong>20.000 Hz</strong>.</li>
+                    </ul>
+                    <p>Dơi thường sử dụng âm thanh trong khoảng <strong>20–60 kHz</strong> để định vị.</p>
+
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 my-4">
+                        <h4 class="font-bold text-amber-900 mb-1">💡 Tại sao dơi sử dụng tần số cao?</h4>
+                        <p class="text-amber-800 text-xs leading-relaxed">
+                            Sóng âm tần số cao có bước sóng ngắn, giúp phát hiện những vật thể rất nhỏ như côn trùng. Tuy nhiên, nếu tần số quá thấp sẽ khó phát hiện vật thể nhỏ, còn nếu tần số quá cao thì âm thanh suy giảm nhanh trong không khí, khiến phạm vi định vị bị ngắn hơn.
+                        </p>
+                    </div>
+
+                    <p>
+                        Dơi xác định khoảng cách đến mục tiêu bằng cách đo <strong>thời gian</strong> từ khi phát âm thanh đến khi nhận được âm phản hồi.
+                    </p>
+                </div>
+
+                <div class="mt-8 pt-4 border-t border-gray-100 flex justify-between items-center">
+                    <button onclick="markSectionComplete(2)" id="btn-complete-2" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow transition">
+                        ✓ Đánh dấu đã học phần này
+                    </button>
+                    <div class="flex gap-2">
+                        <button onclick="switchSection(1)" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-slate-700 text-xs font-semibold rounded-lg transition">← Quay lại</button>
+                        <button onclick="switchSection(3)" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-lg shadow transition">Tiếp theo →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3 -->
+            <div id="section-3" class="content-section hidden bg-white rounded-2xl shadow-sm border border-sky-100 p-6 md:p-8">
+                <div class="border-b border-gray-100 pb-4 mb-6">
+                    <span class="inline-block px-3 py-1 bg-sky-100 text-sky-800 rounded-full text-xs font-semibold mb-2">Phần 3 / 7</span>
+                    <h2 class="text-2xl font-bold text-slate-900">3. Cấu tạo cơ thể giúp dơi định vị</h2>
+                    <p class="text-sm text-slate-500 mt-1">Mục tiêu: Khám phá các bộ phận sinh học chuyên hóa giúp dơi phát và thu nhận siêu âm.</p>
+                </div>
+
+                <div class="space-y-4 text-sm text-slate-700 leading-relaxed">
+                    <p>Cơ thể dơi sở hữu các bộ phận quan trọng chuyên biệt cho việc định vị bằng âm thanh:</p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="p-3 bg-sky-50 rounded-xl border border-sky-100">
+                            <strong class="text-sky-900 block mb-1">🎤 Thanh quản (Larynx)</strong>
+                            <span class="text-xs text-slate-600">Giúp tạo ra âm thanh tần số cao.</span>
+                        </div>
+                        <div class="p-3 bg-sky-50 rounded-xl border border-sky-100">
+                            <strong class="text-sky-900 block mb-1">👂 Tai (Ears)</strong>
+                            <span class="text-xs text-slate-600">Thu nhận âm phản hồi cực nhạy.</span>
+                        </div>
+                        <div class="p-3 bg-sky-50 rounded-xl border border-sky-100">
+                            <strong class="text-sky-900 block mb-1">🐚 Ốc tai (Cochlea)</strong>
+                            <span class="text-xs text-slate-600">Tiếp nhận và xử lý tín hiệu âm thanh phức tạp.</span>
+                        </div>
+                        <div class="p-3 bg-sky-50 rounded-xl border border-sky-100">
+                            <strong class="text-sky-900 block mb-1">🔸 Tragus (Nắp tai)</strong>
+                            <span class="text-xs text-slate-600">Mẩu sụn nhỏ ở tai giúp xác định hướng âm thanh.</span>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-sky-50 rounded-xl border border-sky-100 mt-3">
+                        <strong class="text-sky-900 block mb-1">👃 Lá mũi (Nose-leaf)</strong>
+                        <span class="text-xs text-slate-600">Cấu trúc da đặc biệt giúp một số loài dơi định hướng âm thanh phát ra từ mũi.</span>
+                    </div>
+
+                    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mt-4">
+                        <h4 class="font-bold text-emerald-900 mb-1">🛡️ Cơ chế bảo vệ thính giác</h4>
+                        <p class="text-emerald-800 text-xs leading-relaxed">
+                            Khi phát ra âm thanh cường độ lớn để định vị, các cơ trong tai dơi tự động co lại để giảm tác động của âm thanh cực lớn đó lên chính hệ thống nghe của chúng, tránh bị điếc tạm thời.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-4 border-t border-gray-100 flex justify-between items-center">
+                    <button onclick="markSectionComplete(3)" id="btn-complete-3" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow transition">
+                        ✓ Đánh dấu đã học phần này
+                    </button>
+                    <div class="flex gap-2">
+                        <button onclick="switchSection(2)" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-slate-700 text-xs font-semibold rounded-lg transition">← Quay lại</button>
+                        <button onclick="switchSection(4)" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-lg shadow transition">Tiếp theo →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4 -->
+            <div id="section-4" class="content-section hidden bg-white rounded-2xl shadow-sm border border-sky-100 p-6 md:p-8">
+                <div class="border-b border-gray-100 pb-4 mb-6">
+                    <span class="inline-block px-3 py-1 bg-sky-100 text-sky-800 rounded-full text-xs font-semibold mb-2">Phần 4 / 7</span>
+                    <h2 class="text-2xl font-bold text-slate-900">4. Các dạng âm thanh và quá trình săn mồi</h2>
+                    <p class="text-sm text-slate-500 mt-1">Mục tiêu: Nắm vững các tín hiệu Narrowband, Broadband và 3 giai đoạn săn mồi.</p>
+                </div>
+
+                <div class="space-y-4 text-sm text-slate-700 leading-relaxed">
+                    <p>Dơi sử dụng hai dạng tín hiệu âm thanh chính:</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
+                            <strong class="text-slate-900 block mb-1">Narrowband (CF) – Âm thanh băng hẹp</strong>
+                            <p class="text-xs text-slate-600">Duy trì tần số gần như không đổi. Giúp dơi phát hiện và nhận biết đặc điểm chuyển động của con mồi.</p>
+                        </div>
+                        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
+                            <strong class="text-slate-900 block mb-1">Broadband (FM) – Âm thanh băng rộng</strong>
+                            <p class="text-xs text-slate-600">Tần số thay đổi nhanh. Giúp dơi xác định khoảng cách và vị trí vật thể cực kỳ chính xác.</p>
+                        </div>
+                    </div>
+
+                    <h4 class="font-bold text-slate-800 pt-2">🎯 Ba giai đoạn săn mồi của dơi:</h4>
+                    <div class="space-y-2">
+                        <div class="flex items-start gap-3 p-3 bg-sky-50 rounded-xl border border-sky-100">
+                            <span class="bg-sky-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
+                            <div>
+                                <strong class="text-sky-900 text-xs uppercase tracking-wider block">Search (Tìm kiếm)</strong>
+                                <span class="text-xs text-slate-600">Tìm kiếm con mồi bằng các xung âm thanh tương đối chậm.</span>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-3 bg-sky-50 rounded-xl border border-sky-100">
+                            <span class="bg-sky-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
+                            <div>
+                                <strong class="text-sky-900 text-xs uppercase tracking-wider block">Approach (Tiếp cận)</strong>
+                                <span class="text-xs text-slate-600">Tăng tốc độ phát âm khi phát hiện con mồi.</span>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-3 bg-sky-50 rounded-xl border border-sky-100">
+                            <span class="bg-sky-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
+                            <div>
+                                <strong class="text-sky-900 text-xs uppercase tracking-wider block">Terminal Buzz (Tấn công chớp nhoáng)</strong>
+                                <span class="text-xs text-slate-600">Phát âm thanh rất nhanh, lên tới 200 xung/giây, ngay trước khi bắt mồi.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-slate-500 italic mt-2">
+                        * Một số loài dơi móng ngựa còn sử dụng <strong>Doppler Shift Compensation (DSC)</strong> – cơ chế điều chỉnh tần số âm thanh để bù lại sự thay đổi do chuyển động khi bay.
+                    </p>
+                </div>
+
+                <div class="mt-8 pt-4 border-t border-gray-100 flex justify-between items-center">
+                    <button onclick="markSectionComplete(4)" id="btn-complete-4" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow transition">
+                        ✓ Đánh dấu đã học phần này
+                    </button>
+                    <div class="flex gap-2">
+                        <button onclick="switchSection(3)" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-slate-700 text-xs font-semibold rounded-lg transition">← Quay lại</button>
+                        <button onclick="switchSection(5)" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-lg shadow transition">Tiếp theo →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 5 -->
+            <div id="section-5" class="content-section hidden bg-white rounded-2xl shadow-sm border border-sky-100 p-6 md:p-8">
+                <div class="border-b border-gray-100 pb-4 mb-6">
+                    <span class="inline-block px-3 py-1 bg-sky-100 text-sky-800 rounded-full text-xs font-semibold mb-2">Phần 5 / 7</span>
+                    <h2 class="text-2xl font-bold text-slate-900">5. Tiến hóa và sự đa dạng chế độ ăn</h2>
+                    <p class="text-sm text-slate-500 mt-1">Mục tiêu: Hiểu sự tiến hóa trên 50 triệu năm và các nhóm dơi theo nguồn thức ăn.</p>
+                </div>
+
+                <div class="space-y-4 text-sm text-slate-700 leading-relaxed">
+                    <p>
+                        Dơi đã xuất hiện cách đây hơn <strong>50 triệu năm</strong>. Qua quá trình tiến hóa, chúng thích nghi với nhiều môi trường sống và nguồn thức ăn khác nhau.
+                    </p>
+
+                    <!-- Table of diets -->
+                    <div class="overflow-x-auto border border-slate-200 rounded-xl my-4">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-sky-50 text-sky-900 border-b border-sky-200">
+                                    <th class="p-3 font-bold">Nhóm dơi</th>
+                                    <th class="p-3 font-bold">Thức ăn</th>
+                                    <th class="p-3 font-bold">Đặc điểm / Thích nghi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 text-slate-700">
+                                <tr>
+                                    <td class="p-3 font-semibold text-slate-900">Insectivorous</td>
+                                    <td class="p-3">Côn trùng</td>
+                                    <td class="p-3">Săn muỗi, bướm và côn trùng bằng echolocation.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-semibold text-slate-900">Frugivorous</td>
+                                    <td class="p-3">Trái cây</td>
+                                    <td class="p-3">Hàm khỏe, ăn nhiều loại quả, điều hòa đường huyết tốt.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-semibold text-slate-900">Nectarivorous</td>
+                                    <td class="p-3">Mật hoa</td>
+                                    <td class="p-3">Lưỡi dài để hút mật, giúp thụ phấn cho hoa.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-semibold text-slate-900">Carnivorous</td>
+                                    <td class="p-3">Thịt</td>
+                                    <td class="p-3">Săn động vật nhỏ (ếch, thằn lằn, dơi khác).</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-semibold text-slate-900">Piscivorous</td>
+                                    <td class="p-3">Cá</td>
+                                    <td class="p-3">Bắt cá trên mặt nước bằng móng chân lớn.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-semibold text-slate-900">Sanguivorous</td>
+                                    <td class="p-3">Máu</td>
+                                    <td class="p-3">Thích nghi hút máu, đào thải sắt dư thừa, cảm nhận nhiệt.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p>
+                        Tiến hóa vẫn đang diễn ra. Những khác biệt về kích thước, hình thái và tập tính giữa các quần thể góp phần hình thành loài mới.
+                    </p>
+                </div>
+
+                <div class="mt-8 pt-4 border-t border-gray-100 flex justify-between items-center">
+                    <button onclick="markSectionComplete(5)" id="btn-complete-5" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow transition">
+                        ✓ Đánh dấu đã học phần này
+                    </button>
+                    <div class="flex gap-2">
+                        <button onclick="switchSection(4)" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-slate-700 text-xs font-semibold rounded-lg transition">← Quay lại</button>
+                        <button onclick="switchSection(6)" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-lg shadow transition">Tiếp theo →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 6 -->
+            <div id="section-6" class="content-section hidden bg-white rounded-2xl shadow-sm border border-sky-100 p-6 md:p-8">
+                <div class="border-b border-gray-100 pb-4 mb-6">
+                    <span class="inline-block px-3 py-1 bg-sky-100 text-sky-800 rounded-full text-xs font-semibold mb-2">Phần 6 / 7</span>
+                    <h2 class="text-2xl font-bold text-slate-900">6. Dơi và cá heo: Tiến hóa hội tụ</h2>
+                    <p class="text-sm text-slate-500 mt-1">Mục tiêu: So sánh khả năng định vị ở dơi và cá heo, hiểu khái niệm Convergent Evolution.</p>
+                </div>
+
+                <div class="space-y-4 text-sm text-slate-700 leading-relaxed">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="p-4 bg-sky-50 rounded-xl border border-sky-100">
+                            <h4 class="font-bold text-sky-900 mb-2">🦇 Dơi</h4>
+                            <ul class="list-disc list-inside space-y-1 text-xs text-slate-700">
+                                <li>Định vị trong không khí.</li>
+                                <li>Phát sóng siêu âm bằng thanh quản.</li>
+                                <li>Thu âm phản hồi bằng tai.</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+                            <h4 class="font-bold text-indigo-900 mb-2">🐬 Cá heo</h4>
+                            <ul class="list-disc list-inside space-y-1 text-xs text-slate-700">
+                                <li>Định vị trong nước.</li>
+                                <li>Phát âm thanh bằng cấu trúc vùng mũi.</li>
+                                <li>Nhận âm phản hồi qua vùng hàm dưới.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <p>
+                        Hai nhóm động vật này phát triển khả năng định vị bằng âm thanh một cách hoàn toàn độc lập.
+                    </p>
+
+                    <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl">
+                        <strong class="text-amber-900 block mb-1">🔗 Convergent Evolution (Tiến hóa hội tụ)</strong>
+                        <p class="text-amber-800 text-xs leading-relaxed">
+                            Hiện tượng các loài không có quan hệ họ hàng gần phát triển những đặc điểm tương tự do phải chịu áp lực môi trường sống tương đồng.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                        <h4 class="font-bold text-slate-800 mb-1">📌 Phân biệt Microbats và Megabats:</h4>
+                        <ul class="list-disc list-inside space-y-1 text-xs text-slate-600">
+                            <li><strong>Microbats:</strong> Phần lớn sử dụng định vị bằng siêu âm, thường ăn côn trùng và động vật nhỏ.</li>
+                            <li><strong>Megabats:</strong> Phần lớn ăn quả và mật hoa, dựa vào thị giác và khứu giác. (Dơi quả Ai Cập là ngoại lệ có thể dùng tiếng tạch bằng lưỡi để định hướng).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-4 border-t border-gray-100 flex justify-between items-center">
+                    <button onclick="markSectionComplete(6)" id="btn-complete-6" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow transition">
+                        ✓ Đánh dấu đã học phần này
+                    </button>
+                    <div class="flex gap-2">
+                        <button onclick="switchSection(5)" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-slate-700 text-xs font-semibold rounded-lg transition">← Quay lại</button>
+                        <button onclick="switchSection(7)" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg shadow transition">Đến bài kiểm tra 📝 →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 7: Knowledge Review -->
+            <div id="section-7" class="content-section hidden bg-white rounded-2xl shadow-sm border border-sky-100 p-6 md:p-8">
+                <div class="border-b border-gray-100 pb-4 mb-6">
+                    <span class="inline-block px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs font-semibold mb-2">Phần 7 / 7</span>
+                    <h2 class="text-2xl font-bold text-slate-900">7. Kiểm tra kiến thức (10 câu trắc nghiệm)</h2>
+                    <p class="text-sm text-slate-500 mt-1">Hoàn thành bài kiểm tra để tổng kết mức độ hiểu biết của bạn về Lesson 1.</p>
+                </div>
+
+                <form id="quiz-form" class="space-y-6">
+                    <!-- Questions will be injected here -->
+                </form>
+
+                <div class="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <button type="button" onclick="submitQuiz()" class="w-full sm:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md transition">
+                        Nộp bài kiểm tra
+                    </button>
+                    <div id="quiz-result-summary" class="hidden text-sm font-semibold text-slate-800"></div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-sky-100 py-6 mt-12 text-center text-xs text-slate-500">
+        <p>Interactive Learning Web App – Lesson 1: Bats – Echolocation and Evolutionary Adaptation</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Quiz Data
+        const quizQuestions = [
+            {
+                q: "1. Echolocation là gì?",
+                options: { A: "Định vị bằng âm thanh", B: "Định vị bằng ánh sáng", C: "Định vị bằng mùi" },
+                correct: "A"
+            },
+            {
+                q: "2. Ai đưa ra thuật ngữ Echolocation?",
+                options: { A: "Charles Darwin", B: "Donald R. Griffin", C: "Lazzaro Spallanzani" },
+                correct: "B"
+            },
+            {
+                q: "3. Sóng siêu âm có tần số như thế nào?",
+                options: { A: "Dưới 20 Hz", B: "Trên 20.000 Hz", C: "Khoảng 100 Hz" },
+                correct: "B"
+            },
+            {
+                q: "4. Dơi xác định khoảng cách bằng cách nào?",
+                options: { A: "Đo thời gian âm phản hồi", B: "Quan sát màu sắc", C: "Ngửi vật thể" },
+                correct: "A"
+            },
+            {
+                q: "5. Bộ phận nào giúp dơi thu nhận âm phản hồi?",
+                options: { A: "Cánh", B: "Tai", C: "Đuôi" },
+                correct: "B"
+            },
+            {
+                q: "6. Terminal Buzz xảy ra khi nào?",
+                options: { A: "Khi ngủ", B: "Khi tìm nơi trú ẩn", C: "Ngay trước khi bắt mồi" },
+                correct: "C"
+            },
+            {
+                q: "7. Dơi ăn mật hoa có đặc điểm nào?",
+                options: { A: "Lưỡi dài", B: "Vây lớn", C: "Mắt phát sáng" },
+                correct: "A"
+            },
+            {
+                q: "8. Dơi hút máu có khả năng thích nghi nào?",
+                options: { A: "Đào thải sắt dư thừa", B: "Sống dưới nước", C: "Không cần thận" },
+                correct: "A"
+            },
+            {
+                q: "9. Dơi quả Ai Cập sử dụng gì để định hướng?",
+                options: { A: "Tiếng tạch bằng lưỡi", B: "Ánh sáng phát ra từ mắt", C: "Từ trường" },
+                correct: "A"
+            },
+            {
+                q: "10. Tiến hóa hội tụ là gì?",
+                options: { A: "Các loài cùng biến mất", B: "Các loài độc lập phát triển đặc điểm tương tự", C: "Một loài ngừng tiến hóa" },
+                correct: "B"
+            }
+        ];
+
+        // State management
+        let appState = {
+            completedSections: { 1: false, 2: false, 3: false, 4: false, 5: false, 6: false },
+            quizScore: null
+        };
+
+        const navItems = [
+            { id: 'dashboard', label: '📊 Tổng quan (Dashboard)' },
+            { id: '1', label: '1. Echolocation' },
+            { id: '2', label: '2. Âm thanh & Định vị' },
+            { id: '3', label: '3. Cấu tạo cơ thể dơi' },
+            { id: '4', label: '4. Săn mồi & Âm thanh' },
+            { id: '5', label: '5. Tiến hóa & Chế độ ăn' },
+            { id: '6', label: '6. Tiến hóa hội tụ' },
+            { id: '7', label: '7. Kiểm tra kiến thức' }
+        ];
+
+        function initApp() {
+            loadFromLocalStorage();
+            renderNav();
+            renderQuiz();
+            switchSection('dashboard');
+            updateDashboard();
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('bats_lesson1_state');
+            if (saved) {
+                try {
+                    appState = JSON.parse(saved);
+                } catch (e) {
+                    console.error("Error loading state", e);
+                }
+            }
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('bats_lesson1_state', JSON.stringify(appState));
+        }
+
+        function renderNav() {
+            const navContainer = document.getElementById('nav-list');
+            navContainer.innerHTML = '';
+            navItems.forEach(item => {
+                const isCompleted = item.id !== 'dashboard' && item.id !== '7' && appState.completedSections[item.id];
+                const btn = document.createElement('button');
+                btn.onclick = () => switchSection(item.id);
+                btn.className = `w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition nav-btn-${item.id}`;
+                btn.innerHTML = `
+                    <span>${item.label}</span>
+                    ${isCompleted ? '<span class="text-emerald-600 text-xs">✓</span>' : ''}
+                `;
+                navContainer.appendChild(btn);
+            });
+        }
+
+        function switchSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById(`section-${sectionId}`);
+            if (target) target.classList.remove('hidden');
+
+            // Update nav styles
+            navItems.forEach(item => {
+                const btn = document.querySelector(`.nav-btn-${item.id}`);
+                if (btn) {
+                    if (item.id === String(sectionId)) {
+                        btn.className = `w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between bg-sky-500 text-white shadow-sm nav-btn-${item.id}`;
+                    } else {
+                        btn.className = `w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between text-slate-600 hover:bg-slate-50 nav-btn-${item.id}`;
+                    }
+                }
+            });
+
+            if (sectionId === 'dashboard') {
+                updateDashboard();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function markSectionComplete(sectionNum) {
+            appState.completedSections[sectionNum] = true;
+            saveToLocalStorage();
+            renderNav();
+            updateDashboard();
+
+            const btn = document.getElementById(`btn-complete-${sectionNum}`);
+            if (btn) {
+                btn.textContent = "✓ Đã hoàn thành!";
+                btn.classList.add("bg-emerald-800");
+            }
+        }
+
+        function updateDashboard() {
+            const completedCount = Object.values(appState.completedSections).filter(Boolean).length;
+            const pct = Math.round((completedCount / 6) * 100);
+
+            document.getElementById('dash-completed-count').textContent = `${completedCount} / 6`;
+            document.getElementById('dash-progress-pct').textContent = `${pct}%`;
+            document.getElementById('header-progress-bar').style.width = `${pct}%`;
+            document.getElementById('header-progress-text').textContent = `${pct}%`;
+
+            if (appState.quizScore !== null) {
+                document.getElementById('dash-quiz-score').textContent = `${appState.quizScore} / 10`;
+            } else {
+                document.getElementById('dash-quiz-score').textContent = `Chưa thi`;
+            }
+        }
+
+        function resetProgress() {
+            if (confirm("Bạn có chắc chắn muốn đặt lại toàn bộ tiến độ học tập?")) {
+                appState = { completedSections: { 1: false, 2: false, 3: false, 4: false, 5: false, 6: false }, quizScore: null };
+                saveToLocalStorage();
+                renderNav();
+                updateDashboard();
+                switchSection('dashboard');
+            }
+        }
+
+        function toggleReveal(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('hidden');
+        }
+
+        function renderQuiz() {
+            const form = document.getElementById('quiz-form');
+            form.innerHTML = '';
+            quizQuestions.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3';
+                div.innerHTML = `
+                    <p class="font-bold text-sm text-slate-900">${item.q}</p>
+                    <div class="space-y-2">
+                        ${Object.entries(item.options).map(([key, val]) => `
+                            <label class="flex items-center gap-2.5 p-2.5 rounded-lg bg-white border border-slate-200 hover:bg-sky-50 cursor-pointer text-xs transition">
+                                <input type="radio" name="q${index}" value="${key}" class="text-indigo-600 focus:ring-indigo-500">
+                                <span class="font-semibold text-slate-700">${key}.</span> 
+                                <span class="text-slate-800">${val}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div id="explanation-${index}" class="hidden text-xs font-semibold p-2.5 rounded-lg mt-2"></div>
+                `;
+                form.appendChild(div);
+            });
+        }
+
+        function submitQuiz() {
+            let score = 0;
+            quizQuestions.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                const expDiv = document.getElementById(`explanation-${index}`);
+                expDiv.classList.remove('hidden');
+
+                if (selected && selected.value === item.correct) {
+                    score++;
+                    expDiv.className = "text-xs font-semibold p-2.5 rounded-lg mt-2 bg-emerald-50 text-emerald-800 border border-emerald-200";
+                    expDiv.textContent = `✓ Chính xác! Đáp án đúng là ${item.correct}.`;
+                } else {
+                    expDiv.className = "text-xs font-semibold p-2.5 rounded-lg mt-2 bg-rose-50 text-rose-800 border border-rose-200";
+                    expDiv.textContent = `✗ Chưa chính xác. Đáp án đúng là ${item.correct}.`;
+                }
+            });
+
+            appState.quizScore = score;
+            saveToLocalStorage();
+            updateDashboard();
+
+            const summary = document.getElementById('quiz-result-summary');
+            summary.classList.remove('hidden');
+            summary.innerHTML = `Kết quả của bạn: <span class="text-indigo-600 font-bold text-base">${score} / 10</span> câu đúng (${Math.round(score*10)}%).`;
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
